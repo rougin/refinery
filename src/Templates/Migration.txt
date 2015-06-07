@@ -1,0 +1,21 @@
+<?php defined('BASEPATH') OR exit('No direct script access allowed');
+
+class Migration_[name] extends CI_Migration {
+
+	/**
+	 * Run the migrations
+	 */
+	public function up()
+	{
+		[up]
+	}
+
+	/**
+	 * Reverse the migrations
+	 */
+	public function down()
+	{
+		[down]
+	}
+
+}

@@ -1,0 +1,26 @@
+{
+	"name": "rougin/refinery",
+	"description": "A command line interface for Migrations Class in CodeIgniter",
+	"keywords": ["refinery", "database", "migrations", "php"],
+	"require": {
+		"php": ">=5.3.0",
+		"rougin/describe": "*"
+	},
+	"license": "MIT",
+	"authors": [
+		{
+			"name": "Rougin Gutib",
+			"email": "rougingutib@gmail.com"
+		}
+	],
+	"bin": ["bin/refinery", "bin/refinery.php"],
+	"autoload": {
+		"psr-4": {
+			"Rougin\\Refinery\\": "src/"
+		}
+	},
+	"suggest": {
+		"rougin/codeigniter": "Yet another way to install CodeIgniter via Composer",
+		"rougin/combustor": "A tool for speeding up web development in CodeIgniter"
+	}
+}
