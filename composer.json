@@ -4,6 +4,7 @@
 	"keywords": ["refinery", "database", "migrations", "php"],
 	"require": {
 		"php": ">=5.3.0",
+		"symfony/console": "*",
 		"rougin/describe": "*"
 	},
 	"license": "MIT",
