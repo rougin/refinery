@@ -143,8 +143,6 @@ Create a new migration file
 
 **NOTE**: The following options below are only available when you use the ```add_```, ```delete_```, or ```modify_``` text
 
-* ```--revert``` - Number of times to revert from the list of migrations
-
 * ```--sequential``` - Generates a migration file with a sequential identifier
 
 	**NOTE**: If you really want to use the sequential identifier, just change your ```$config['migration_type']``` in ```application/config/migration.php```
