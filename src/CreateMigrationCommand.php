@@ -209,15 +209,13 @@ class CreateMigrationCommand extends Command
 				$tableInformation = $this->_describe->getInformationFromTable($parameters['table']);
 
 				foreach ($tableInformation as $row) {
-					if ($row->field == $parameters['column']) {
-						preg_match('/(.*)\((\d+)\)/', $row->type, $match);
-
-						$parameters['type']           = strtoupper($match[1]);
-						$parameters['length']         = strtoupper($match[2]);
-						$parameters['auto_increment'] = ($row->extra == 'auto_increment') ? 'TRUE' : 'FALSE';
-						$parameters['null']           = ($row->isNull) ? TRUE : FALSE;
-						$parameters['default']        = ($row->defaultValue) ? $row->defaultValue : '';
-						$parameters['primary']        = ($row->key == 'PRI') ? TRUE : FALSE;
+					if ($row->getField() == $parameters['column']) {
+						$parameters['type']           = $row->getDataType();
+						$parameters['length']         = $row->getLength();
+						$parameters['auto_increment'] = ($row->isAutoIncrement()) ? 'TRUE' : 'FALSE';
+						$parameters['null']           = ($row->isNull()) ? TRUE : FALSE;
+						$parameters['default']        = ($row->getDefaultValue()) ? $row->getDefaultValue() : '';
+						$parameters['primary']        = ($row->isPrimaryKey()) ? TRUE : FALSE;
 					}
 				}
 
