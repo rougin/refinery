@@ -6,8 +6,14 @@ use Rougin\Refinery\MigrateResetCommand;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Helper\HelperSet;
 
-$codeigniter = require realpath('vendor') . '/rougin/refinery/src/CodeIgniterInstance.php';
-$application = new Application('Refinery', '0.1.0');
+/**
+ * Load the CodeIgniter instance
+ */
+
+$instance = new Rougin\SparkPlug\Instance();
+$codeigniter = $instance->get();
+
+$application = new Application('Refinery', '0.2.1');
 
 $application->add(new MigrateCommand($codeigniter));
 $application->add(new MigrateResetCommand($codeigniter));

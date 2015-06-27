@@ -145,6 +145,10 @@ class CreateMigrationCommand extends Command
 	 */
 	protected function execute(InputInterface $input, OutputInterface $output)
 	{
+		if ( ! file_exists(APPPATH . 'migrations/')) {
+			mkdir(APPPATH . 'migrations');
+		}
+
 		$name         = $this->_underscore($input->getArgument('name'));
 		$filename     = APPPATH . 'migrations/' . date('YmdHis') . '_' . $name . '.php';
 		$isSequential = strpos($this->_migrationFile, '$config[\'migration_type\'] = \'timestamp\'');
