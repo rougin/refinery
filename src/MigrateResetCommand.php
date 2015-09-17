@@ -1,18 +1,19 @@
 <?php
 
-namespace Rougin\Refinery;
+namespace Rougin\Refinery\Commands;
 
-use Symfony\Component\Console\Command\Command;
+use Rougin\Blueprint\AbstractCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class MigrateResetCommand extends Command
+class MigrateResetCommand extends AbstractCommand
 {
-	protected $ci;
-	protected $migrationConfig;
-	protected $migrationFile;
+
+	private $_ci              = NULL;
+	private $_migrationConfig = NULL;
+	private $_migrationFile   = NULL;
 
 	/**
 	 * Get the CodeIgniter instance and the migration file
@@ -21,9 +22,9 @@ class MigrateResetCommand extends Command
 	{
 		parent::__construct();
 
-		$this->ci              = $codeigniter;
-		$this->migrationConfig = APPPATH . '/config/migration.php';
-		$this->migrationFile   = file_get_contents($this->migrationConfig);
+		$this->_ci              = $codeigniter;
+		$this->_migrationConfig = APPPATH . '/config/migration.php';
+		$this->_migrationFile   = file_get_contents($this->_migrationConfig);
 	}
 
 	/**
@@ -34,15 +35,15 @@ class MigrateResetCommand extends Command
 	 */
 	protected function _change_version($current, $timestamp)
 	{
-		$migrationFile = file_get_contents($this->migrationConfig);
+		$migrationFile = file_get_contents($this->_migrationConfig);
 
 		$currentVersion = '$config[\'migration_version\'] = ' . $current . ';';
 		$newVersion = '$config[\'migration_version\'] = ' . $timestamp . ';';
 
 		$migrationFile = str_replace($currentVersion, $newVersion, $migrationFile);
 
-		$file = fopen($this->migrationConfig, 'wb');
-		file_put_contents($this->migrationConfig, $migrationFile);
+		$file = fopen($this->_migrationConfig, 'wb');
+		file_put_contents($this->_migrationConfig, $migrationFile);
 		fclose($file);
 	}
 
@@ -53,7 +54,7 @@ class MigrateResetCommand extends Command
 	 */
 	protected function _toggle_migration($enabled = FALSE)
 	{
-		$migrationFile = file_get_contents($this->migrationConfig);
+		$migrationFile = file_get_contents($this->_migrationConfig);
 		$search        = '$config[\'migration_enabled\'] = TRUE;';
 		$replace       = '$config[\'migration_enabled\'] = FALSE;';
 
@@ -64,8 +65,8 @@ class MigrateResetCommand extends Command
 
 		$migrationFile = str_replace($search, $replace, $migrationFile);
 
-		$file = fopen($this->migrationConfig, 'wb');
-		file_put_contents($this->migrationConfig, $migrationFile);
+		$file = fopen($this->_migrationConfig, 'wb');
+		file_put_contents($this->_migrationConfig, $migrationFile);
 		fclose($file);
 	}
 
@@ -90,7 +91,7 @@ class MigrateResetCommand extends Command
 		 * Search the current migration version
 		 */
 
-		preg_match_all('/\$config\[\'migration_version\'\] = (\d+);/', $this->migrationFile, $match);
+		preg_match_all('/\$config\[\'migration_version\'\] = (\d+);/', $this->_migrationFile, $match);
 		$current = $match[1][0];
 
 		/**
@@ -100,8 +101,8 @@ class MigrateResetCommand extends Command
 		$this->_toggle_migration(TRUE);
 		$this->_change_version($current, 0);
 
-		$this->ci->load->library('migration');
-		$this->ci->migration->current();
+		$this->_ci->load->library('migration');
+		$this->_ci->migration->current();
 
 		$this->_toggle_migration();
 		$output->writeln('<info>Database has been resetted.</info>');

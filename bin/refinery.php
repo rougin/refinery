@@ -1,42 +1,32 @@
-<?php require realpath('vendor') . '/autoload.php';
+<?php
 
-use Rougin\Describe\Describe;
-use Rougin\Refinery\CreateMigrationCommand;
-use Rougin\Refinery\MigrateCommand;
-use Rougin\Refinery\MigrateResetCommand;
-use Rougin\SparkPlug\Instance;
-use Symfony\Component\Console\Application;
-use Symfony\Component\Console\Helper\HelperSet;
+// Define the VENDOR path
+$vendor = realpath('vendor');
 
-/**
- * Load the CodeIgniter instance
- */
+// Include the Composer Autoloader
+require $vendor . '/autoload.php';
 
-$instance = new Instance();
-$codeigniter = $instance->get();
+$filePath = realpath(__DIR__ . '/../refinery.yml');
+$directory = str_replace('/refinery.yml', '', $filePath);
 
-/**
- * Load Describe
- */
+define('BLUEPRINT_FILENAME', $filePath);
+define('BLUEPRINT_DIRECTORY', $directory);
 
-require APPPATH . 'config/database.php';
+// Load the CodeIgniter instance
+$instance = new Rougin\SparkPlug\Instance();
 
-$db['default']['driver'] = $db['default']['dbdriver'];
-unset($db['default']['dbdriver']);
+// Include the Inflector helper from CodeIgniter
+require BASEPATH . 'helpers/inflector_helper.php';
 
-$describe = new Describe($db['default']);
+// Load the Blueprint library
+$blueprint = include($vendor . '/rougin/blueprint/bin/blueprint.php');
 
-/**
- * Get the migrations.php from CodeIgniter
- */
+if ($blueprint->hasError) {
+    exit($blueprint->showError());
+}
 
-$migration = array();
-$migration['path'] = APPPATH . '/config/migration.php';
-$migration['file'] = file_get_contents($migration['path']);
+$blueprint->console->setName('Refinery');
+$blueprint->console->setVersion('0.1.3');
 
-$application = new Application('Refinery', '0.2.1');
-
-$application->add(new MigrateCommand($codeigniter, $migration));
-$application->add(new MigrateResetCommand($codeigniter));
-$application->add(new CreateMigrationCommand($describe, $migration));
-$application->run();
+// Run the Refinery console application
+$blueprint->console->run();

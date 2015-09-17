@@ -24,22 +24,16 @@ $ php vendor/bin/refinery create:migration create_user_table
 ```php
 class Migration_create_user_table extends CI_Migration {
 
-	/**
-	 * Run the migrations
-	 */
-	public function up()
-	{
-		$this->dbforge->add_field('id');
-		$this->dbforge->create_table('user');
-	}
+    public function up()
+    {
+        $this->dbforge->add_field('id');
+        $this->dbforge->create_table('user');
+    }
 
-	/**
-	 * Reverse the migrations
-	 */
-	public function down()
-	{
-		$this->dbforge->drop_table('user');
-	}
+    public function down()
+    {
+        $this->dbforge->drop_table('user');
+    }
 
 }
 ```
@@ -56,32 +50,34 @@ $ php vendor/bin/refinery create:migration add_name_in_user_table
 ```php
 class Migration_add_name_in_user_table extends CI_Migration {
 
-	/**
-	 * Run the migrations
-	 */
-	public function up()
-	{
-		$this->dbforge->add_column('user', array(
-			'name' => array(
-				'type' => 'VARCHAR',
-				'constraint' => '50',
-				'auto_increment' => FALSE,
-				'null' => FALSE,
-				'unsigned' => FALSE
-			)
-		));
-	}
+    public function up()
+    {
+        $this->dbforge->add_column('user', array(
+            'name' => array(
+                'type' => 'VARCHAR',
+                'constraint' => '50',
+                'auto_increment' => FALSE,
+                'null' => FALSE,
+                'unsigned' => FALSE
+            )
+        ));
+    }
 
-	/**
-	 * Reverse the migrations
-	 */
-	public function down()
-	{
-		$this->dbforge->drop_column('user', 'name');
-	}
+    public function down()
+    {
+        $this->dbforge->drop_column('user', 'name');
+    }
 
 }
 ```
+
+#### Available keywords
+
+* create_*table*_table
+* add_*column*_in_*table*_table
+* modify_*column*_in_*table*_table
+* delete_*column*_in_*table*_table
+
 
 ### Migrating all files in ```application/migrations``` directory
 
@@ -121,7 +117,7 @@ Migrate the database
 
 * ```--revert``` - Number of times to revert from the list of migrations
 
-	**NOTE**: If an error occurs about URI, just include an equal sign ```=``` in ```$config['permitted_uri_chars']``` on ```application/config.php```
+    **NOTE**: If an error occurs about URI, just include an equal sign ```=``` in ```$config['permitted_uri_chars']``` on ```application/config.php```
 
 #### ```migrate:reset```
 
@@ -145,7 +141,7 @@ Create a new migration file
 
 * ```--sequential``` - Generates a migration file with a sequential identifier
 
-	**NOTE**: If you really want to use the sequential identifier, just change your ```$config['migration_type']``` in ```application/config/migration.php```
+    **NOTE**: If you really want to use the sequential identifier, just change your ```$config['migration_type']``` in ```application/config/migration.php```
 
 * ```--type=[LENGTH]``` - Data type of the column
 
