@@ -30,12 +30,17 @@ class CreateMigrationCommand extends AbstractCommand
      */
     protected function configure()
     {
-        $this->setName('create:migration')
-            ->setDescription('Create a new migration file')
+        $this->setName('create')
+            ->setDescription('Creates a new migration file')
             ->addArgument(
                 'name',
                 InputArgument::REQUIRED,
                 'Name of the migration file'
+            )->addOption(
+                'from-database',
+                NULL,
+                InputOption::VALUE_NONE,
+                'Generates a migration based from the database'
             )->addOption(
                 'sequential',
                 NULL,
@@ -113,22 +118,32 @@ class CreateMigrationCommand extends AbstractCommand
             );
 
             if ($files != '') {
-                $number = iterator_count($files) + 1;
+                $number += iterator_count($files);
             }
 
             $sequence = sprintf('%03d', $number);
-            $fileName = $path . '/' . $sequence .
-                '_' . $name . '.php';
+            $fileName = $path . '/' . $sequence . '_' . $name . '.php';
         }
 
         $keywords = explode('_', $name);
 
+        if (
+            $input->getOption('from-database') &&
+            $keywords[0] != 'create' &&
+            count($keywords) != 3
+        ) {
+            $message = '"--from-database" is only available to ' .
+                '"create_*table*_table" keyword.';
+
+            return $output->writeln('<error>' . $message . '</error>');
+        }
+
+        $data['columns'] = [];
         $data['command'] = $keywords[0];
+        $data['defaultColumns'] = [];
         $data['description'] = str_replace($path . '/', '', $fileName);
         $data['name'] = $name;
         $data['table'] = (isset($keywords[1])) ? $keywords[1] : '';
-        $data['columns'] = [];
-        $data['defaultColumns'] = [];
 
         $data['dataTypes'] = [
             'string' => 'VARCHAR',
@@ -136,10 +151,20 @@ class CreateMigrationCommand extends AbstractCommand
         ];
 
         switch ($data['command']) {
+            case 'create':
+                if ( ! $input->getOption('from-database')) {
+                    break;
+                }
+
+                $describe = $this->getDescribe();
+                $data['columns'] = $describe->getInformationFromTable(
+                    $data['table']
+                );
+
+                break;
             case 'add':
             case 'delete':
                 $field = $keywords[1];
-
                 $data['table'] = (isset($keywords[3])) ? $keywords[3] : '';
 
                 $column = new Column();
@@ -168,8 +193,6 @@ class CreateMigrationCommand extends AbstractCommand
                     }
                 }
 
-                break;
-            default:
                 break;
         }
 

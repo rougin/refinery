@@ -11,14 +11,14 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * Migrate Command
+ * Reset Migration Command
  *
- * Migrates the list of migrations found in "application/migrations" directory.
+ * Resets all migrations.
  * 
  * @package Refinery
  * @author  Rougin Royce Gutib <rougingutib@gmail.com>
  */
-class MigrateCommand extends AbstractCommand
+class ResetCommand extends AbstractCommand
 {
     /**
      * Checks whether the command is enabled or not in the current environment.
@@ -46,18 +46,8 @@ class MigrateCommand extends AbstractCommand
      */
     protected function configure()
     {
-        $this->setName('migrate')
-            ->setDescription('Migrates the database')
-            ->addArgument(
-                'version',
-                InputArgument::OPTIONAL,
-                'Migrates to a specified version of the database'
-            )->addOption(
-                'revert',
-                NULL,
-                InputOption::VALUE_OPTIONAL,
-                'Number of times to revert from the list of migrations'
-            );
+        $this->setName('reset')
+            ->setDescription('Resets all migrations');
     }
 
     /**
@@ -73,17 +63,15 @@ class MigrateCommand extends AbstractCommand
             file_get_contents(APPPATH . '/config/migration.php')
         );
 
-        list($filenames, $migrations) = Tools::getMigrations(
-            APPPATH . 'migrations'
-        );
+        if ($current <= 0) {
+            $message = 'Database\'s version is now in 0.';
 
-        $end = count($migrations) - 1;
-        $latest = $migrations[$end];
-        $latestFile = $filenames[$end];
+            return $output->writeln('<info>' . $message . '</info>');
+        }
 
-        // Enable migration and change the current version to a latest one
+        // Enables migration and change the current version to 0
         Tools::toggleMigration(TRUE);
-        Tools::changeVersion($current, $latest);
+        Tools::changeVersion($current, 0);
 
         $codeigniter = Tools::getCodeIgniter();
         $codeigniter->load->library('migration');
@@ -91,22 +79,6 @@ class MigrateCommand extends AbstractCommand
 
         Tools::toggleMigration();
 
-        // Show messages of migrated files
-        if ($current == $latest) {
-            $message = 'Database is up to date.';
-
-            return $output->writeln('<info>' . $message . '</info>');
-        }
-
-        for ($counter = 0; $counter < count($migrations); $counter++) {
-            if ($current >= $migrations[$counter]) {
-                continue;
-            }
-
-            $filename = $filenames[$counter];
-            $message = '"' . $filename . '" has been migrated to the database.';
-
-            $output->writeln('<info>' . $message . '</info>');
-        }
+        return $output->writeln('<info>Database has been resetted.</info>');
     }
 }

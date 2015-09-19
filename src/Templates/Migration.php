@@ -19,7 +19,7 @@ class Migration_{{ name }} extends CI_Migration {
 {% for column in columns if command == 'delete' %}
         $this->dbforge->drop_column('{{ table }}', '{{ column.field }}');
 {% endfor %}
-{% for column in columns if command == 'add' or command == 'modify' %}
+{% for column in columns if command == 'add' or command == 'create' %}
         $this->dbforge->{{ command }}_column('{{ table }}', array(
             '{{ column.field }}' => array(
                 'type' => '{{ dataTypes[column.dataType] }}',
@@ -36,7 +36,7 @@ class Migration_{{ name }} extends CI_Migration {
 
 {% endif %}
 {% endfor %}
-{% if command == 'create' %}
+{% if command == 'create' and columns | length <= 0 %}
         $this->dbforge->add_field('id');
         $this->dbforge->create_table('{{ table }}');
 {% endif %}
@@ -53,7 +53,7 @@ class Migration_{{ name }} extends CI_Migration {
         $this->dbforge->drop_column('{{ table }}', '{{ column.field }}');
 {% endfor %}
 {% for column in columns if command == 'delete' %}
-        $this->dbforge->{{ command }}_column('{{ table }}', array(
+        $this->dbforge->drop_column('{{ table }}', array(
             '{{ column.field }}' => array(
                 'type' => '{{ dataTypes[column.dataType] }}',
                 'constraint' => '{{ column.length }}',
@@ -69,7 +69,7 @@ class Migration_{{ name }} extends CI_Migration {
 {% endif %}
 {% endfor %}
 {% for column in defaultColumns %}
-        $this->dbforge->{{ command }}_column('{{ table }}', array(
+        $this->dbforge->modify_column('{{ table }}', array(
             '{{ column.field }}' => array(
                 'type' => '{{ dataTypes[column.dataType] }}',
                 'constraint' => '{{ column.length }}',

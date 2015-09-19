@@ -12,10 +12,19 @@ Install ```Refinery``` via [Composer](https://getcomposer.org):
 
 # Examples
 
+### Keywords
+
+```Refinery``` also provides a *ready-to-eat* migration based on the following keywords below:
+
+* ```create_(table)_table```
+* ```add_(column)_in_(table)_table```
+* ```modify_(column)_in_(table)_table```
+* ```delete_(column)_in_(table)_table```
+
 ### Creating a table named "user"
 
 ```bash
-$ php vendor/bin/refinery create:migration create_user_table
+$ php vendor/bin/refinery create create_user_table
 "20150607123241_create_user_table.php" has been created.
 ```
 
@@ -41,7 +50,7 @@ class Migration_create_user_table extends CI_Migration {
 ### Adding column named "name" in "user" table
 
 ```bash
-$ php vendor/bin/refinery create:migration add_name_in_user_table
+$ php vendor/bin/refinery create add_name_in_user_table
 "20150607123510_add_name_in_user_table.php" has been created.
 ```
 
@@ -71,14 +80,6 @@ class Migration_add_name_in_user_table extends CI_Migration {
 }
 ```
 
-#### Available keywords
-
-* create_*table*_table
-* add_*column*_in_*table*_table
-* modify_*column*_in_*table*_table
-* delete_*column*_in_*table*_table
-
-
 ### Migrating all files in ```application/migrations``` directory
 
 ```bash
@@ -90,14 +91,14 @@ $ php vendor/bin/refinery migrate
 ### You can also revert back if you want
 
 ```bash
-$ php vendor/bin/refinery migrate --revert=1
+$ php vendor/bin/refinery rollback
 Database is reverted back to version 20150607123241. (20150607123241_create_user_table)
 ```
 
 ### Or reset them back
 
 ```bash
-$ php vendor/bin/refinery migrate:reset
+$ php vendor/bin/refinery reset
 Database has been resetted.
 ```
 
@@ -107,29 +108,29 @@ Database has been resetted.
 
 #### Description:
 
-Migrate the database
+Migrates the database
+
+#### ```rollback```
+
+#### Description:
+
+Returns to a previous/specified migration
 
 #### Arguments:
 
-* ```version``` (**Optional**) - Migrate to a specified version of the database
+* ```version``` - Specified version of the migration
 
-#### Options:
-
-* ```--revert``` - Number of times to revert from the list of migrations
-
-    **NOTE**: If an error occurs about URI, just include an equal sign ```=``` in ```$config['permitted_uri_chars']``` on ```application/config.php```
-
-#### ```migrate:reset```
+#### ```reset```
 
 #### Description:
 
-Rollback all migrations back to start
+Resets all migrations
 
-#### ```create:migration```
+#### ```create```
 
 #### Description:
 
-Create a new migration file
+Creates a new migration file
 
 #### Arguments:
 
@@ -137,7 +138,9 @@ Create a new migration file
 
 #### Options:
 
-**NOTE**: The following options below are only available when you use the ```add_```, ```delete_```, or ```modify_``` text
+**NOTE**: The following options below are only available when you use the ```add_```, ```delete_```, or ```modify_``` keywords
+
+* ```--from-database``` - Generates a migration file that is based from the database
 
 * ```--sequential``` - Generates a migration file with a sequential identifier
 
