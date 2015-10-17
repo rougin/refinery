@@ -2,7 +2,7 @@
 
 namespace Rougin\Refinery\Commands;
 
-use Rougin\Blueprint\AbstractCommand;
+use Rougin\Refinery\AbstractCommand;
 use Rougin\Refinery\Tools;
 use Rougin\SparkPlug\Instance;
 use Symfony\Component\Console\Input\InputArgument;

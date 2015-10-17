@@ -5,7 +5,7 @@ namespace Rougin\Refinery\Commands;
 use FilesystemIterator;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
-use Rougin\Blueprint\AbstractCommand;
+use Rougin\Refinery\AbstractCommand;
 use Rougin\Describe\Column;
 use Rougin\Describe\Describe;
 use Symfony\Component\Console\Input\InputArgument;
