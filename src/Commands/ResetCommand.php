@@ -73,9 +73,8 @@ class ResetCommand extends AbstractCommand
         Tools::toggleMigration(TRUE);
         Tools::changeVersion($current, 0);
 
-        $codeigniter = Tools::getCodeIgniter();
-        $codeigniter->load->library('migration');
-        $codeigniter->migration->current();
+        $this->codeigniter->load->library('migration');
+        $this->codeigniter->migration->current();
 
         Tools::toggleMigration();
 

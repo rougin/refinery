@@ -156,10 +156,7 @@ class CreateMigrationCommand extends AbstractCommand
                     break;
                 }
 
-                $describe = $this->getDescribe();
-                $data['columns'] = $describe->getInformationFromTable(
-                    $data['table']
-                );
+                $data['columns'] = $this->describe->getTable($data['table']);
 
                 break;
             case 'add':
@@ -182,8 +179,7 @@ class CreateMigrationCommand extends AbstractCommand
 
                 array_push($data['columns'], $this->setColumn($column, $input));
 
-                $describe = $this->getDescribe();
-                $table = $describe->getInformationFromTable($data['table']);
+                $table = $this->describe->getTable($data['table']);
 
                 foreach ($table as $column) {
                     if ($column->getField() == $field) {
@@ -196,7 +192,7 @@ class CreateMigrationCommand extends AbstractCommand
                 break;
         }
 
-        $template = $this->renderer->render('Migration.php', $data);
+        $template = $this->renderer->render('Migration.template', $data);
 
         $file = fopen($fileName, 'wb');
         file_put_contents($fileName, $template);
@@ -205,21 +201,6 @@ class CreateMigrationCommand extends AbstractCommand
         $message = '"' . $fileName . '" has been created.';
 
         return $output->writeln('<info>' . $message . '</info>');
-    }
-
-    /**
-     * Gets an instance of Describe.
-     * 
-     * @return Rougin\Describe\Describe
-     */
-    private function getDescribe()
-    {
-        require APPPATH . '/config/database.php';
-
-        $db['default']['driver'] = $db['default']['dbdriver'];
-        unset($db['default']['dbdriver']);
-
-        return new Describe($db['default']);
     }
 
     /**

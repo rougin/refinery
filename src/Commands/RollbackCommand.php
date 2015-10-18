@@ -98,9 +98,8 @@ class RollbackCommand extends AbstractCommand
         Tools::toggleMigration(TRUE);
         Tools::changeVersion($current, $latest);
 
-        $codeigniter = Tools::getCodeIgniter();
-        $codeigniter->load->library('migration');
-        $codeigniter->migration->current();
+        $this->codeigniter->load->library('migration');
+        $this->codeigniter->migration->current();
 
         Tools::toggleMigration();
 

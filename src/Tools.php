@@ -45,18 +45,6 @@ class Tools
     }
 
     /**
-     * Gets an instance of CodeIgniter.
-     * 
-     * @return Rougin\SparkPlug\Instance
-     */
-    public static function getCodeIgniter()
-    {
-        $instance = new Instance();
-
-        return $instance->get();
-    }
-
-    /**
      * Gets the latest migration version
      * 
      * @return string
