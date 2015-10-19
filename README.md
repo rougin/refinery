@@ -1,34 +1,28 @@
 # Refinery
 
-[![Latest Stable Version](https://poser.pugx.org/rougin/refinery/v/stable)](https://packagist.org/packages/rougin/refinery) [![Total Downloads](https://poser.pugx.org/rougin/refinery/downloads)](https://packagist.org/packages/rougin/refinery) [![Latest Unstable Version](https://poser.pugx.org/rougin/refinery/v/unstable)](https://packagist.org/packages/rougin/refinery) [![License](https://poser.pugx.org/rougin/refinery/license)](https://packagist.org/packages/rougin/refinery) [![endorse](https://api.coderwall.com/rougin/endorsecount.png)](https://coderwall.com/rougin)
+[![Latest Version on Packagist][ico-version]][link-packagist]
+[![Software License][ico-license]](LICENSE.md)
+[![Build Status][ico-travis]][link-travis]
+[![Coverage Status][ico-scrutinizer]][link-scrutinizer]
+[![Quality Score][ico-code-quality]][link-code-quality]
+[![Total Downloads][ico-downloads]][link-downloads]
 
-A command line interface for [Migrations Class](http://www.codeigniter.com/user_guide/libraries/migration.html) in [CodeIgniter](http://www.codeigniter.com/)
+Generates "ready-to-eat" migrations for [CodeIgniter](http://www.codeigniter.com/). An extension and a command line interface for [Migrations Class](http://www.codeigniter.com/user_guide/libraries/migration.html).
 
-# Installation
+## Install
 
-Install ```Refinery``` via [Composer](https://getcomposer.org):
+Via Composer
 
-```$ composer require rougin/refinery```
+``` bash
+$ composer require rougin/refinery
+```
 
-# Examples
+## Usage
 
-### Keywords
-
-```Refinery``` also provides a *ready-to-eat* migration based on the following keywords below:
-
-* ```create_(table)_table```
-* ```add_(column)_in_(table)_table```
-* ```modify_(column)_in_(table)_table```
-* ```delete_(column)_in_(table)_table```
-
-### Creating a table named "user"
-
-```bash
+``` bash
 $ php vendor/bin/refinery create create_user_table
 "20150607123241_create_user_table.php" has been created.
 ```
-
-**20150607123241_create_user_table.php**
 
 ```php
 class Migration_create_user_table extends CI_Migration {
@@ -47,14 +41,10 @@ class Migration_create_user_table extends CI_Migration {
 }
 ```
 
-### Adding column named "name" in "user" table
-
 ```bash
 $ php vendor/bin/refinery create add_name_in_user_table
 "20150607123510_add_name_in_user_table.php" has been created.
 ```
-
-**20150607123510_add_name_in_user_table.php**
 
 ```php
 class Migration_add_name_in_user_table extends CI_Migration {
@@ -80,82 +70,60 @@ class Migration_add_name_in_user_table extends CI_Migration {
 }
 ```
 
-### Migrating all files in ```application/migrations``` directory
-
 ```bash
 $ php vendor/bin/refinery migrate
 "20150607123241_create_user_table" has been migrated to the database.
 "20150607123510_add_name_in_user_table" has been migrated to the database.
 ```
 
-### You can also revert back if you want
-
 ```bash
 $ php vendor/bin/refinery rollback
 Database is reverted back to version 20150607123241. (20150607123241_create_user_table)
 ```
-
-### Or reset them back
 
 ```bash
 $ php vendor/bin/refinery reset
 Database has been resetted.
 ```
 
-# Commands
+## Change Log
 
-#### ```migrate```
+Please see [CHANGELOG](CHANGELOG.md) for more information what has changed recently.
 
-#### Description:
+## Testing
 
-Migrates the database
+``` bash
+$ composer test
+```
 
-#### ```rollback```
+## Contributing
 
-#### Description:
+Please see [CONTRIBUTING](CONTRIBUTING.md) for details.
 
-Returns to a previous/specified migration
+## Security
 
-#### Arguments:
+If you discover any security related issues, please email rougingutib@gmail.com instead of using the issue tracker.
 
-* ```version``` - Specified version of the migration
+## Credits
 
-#### ```reset```
+- [Rougin Royce Gutib][link-author]
+- [All Contributors][link-contributors]
 
-#### Description:
+## License
 
-Resets all migrations
+The MIT License (MIT). Please see [License File](LICENSE.md) for more information.
 
-#### ```create```
+[ico-version]: https://img.shields.io/packagist/v/rougin/refinery.svg?style=flat-square
+[ico-license]: https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square
+[ico-travis]: https://img.shields.io/travis/rougin/refinery/master.svg?style=flat-square
+[ico-scrutinizer]: https://img.shields.io/scrutinizer/coverage/g/rougin/refinery.svg?style=flat-square
+[ico-code-quality]: https://img.shields.io/scrutinizer/g/rougin/refinery.svg?style=flat-square
+[ico-downloads]: https://img.shields.io/packagist/dt/rougin/refinery.svg?style=flat-square
 
-#### Description:
-
-Creates a new migration file
-
-#### Arguments:
-
-* ```name``` - Name of the migration file
-
-#### Options:
-
-**NOTE**: The following options below are only available when you use the ```add_```, ```delete_```, or ```modify_``` keywords
-
-* ```--from-database``` - Generates a migration file that is based from the database
-
-* ```--sequential``` - Generates a migration file with a sequential identifier
-
-    **NOTE**: If you really want to use the sequential identifier, just change your ```$config['migration_type']``` in ```application/config/migration.php```
-
-* ```--type=[LENGTH]``` - Data type of the column
-
-* ```--length=[LENGTH]``` - Length of the column
-
-* ```--auto_increment``` - Generates an "AUTO_INCREMENT" flag on the column
-
-* ```--default``` - Generates a default value in the column definition
-
-* ```--null``` - Generates a "NULL" value in the column definition
-
-* ```--primary``` - Generates a "PRIMARY" value in the column definition
-
-* ```--unsigned``` - Generates an "UNSIGNED" value in the column definition
+[link-packagist]: https://packagist.org/packages/rougin/refinery
+[link-travis]: https://travis-ci.org/rougin/refinery
+[link-scrutinizer]: https://scrutinizer-ci.com/g/rougin/refinery/code-structure
+[link-code-quality]: https://scrutinizer-ci.com/g/rougin/refinery
+[link-downloads]: https://packagist.org/packages/rougin/refinery
+[link-author]: https://github.com/rougin
+[link-contributors]: ../../contributors

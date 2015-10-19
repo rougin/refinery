@@ -1,24 +1,49 @@
 {
     "name": "rougin/refinery",
-    "description": "A command line interface for Migrations Class in CodeIgniter",
-    "keywords": ["refinery", "database", "migrations", "php"],
+    "description": "'Ready-to-eat' migrations for Codeigniter",
+    "keywords": [
+        "refinery",
+        "database",
+        "migrations",
+        "php"
+    ],
+    "homepage": "https://github.com/rougin/spark-plug",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Rougin Royce Gutib",
+            "email": "rougingutib@gmail.com",
+            "homepage": "http://rougin.github.io",
+            "role": "Developer"
+        }
+    ],
     "require": {
         "php": ">=5.3.0",
         "rougin/blueprint": "*",
         "rougin/describe": "*",
         "rougin/spark-plug": "*"
     },
-    "license": "MIT",
-    "authors": [
-        {
-            "name": "Rougin Gutib",
-            "email": "rougingutib@gmail.com"
-        }
-    ],
+    "require-dev": {
+        "phpunit/phpunit" : "4.*",
+        "scrutinizer/ocular": "~1.1"
+    },
     "bin": ["bin/refinery", "bin/refinery.php"],
     "autoload": {
         "psr-4": {
             "Rougin\\Refinery\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Rougin\\Refinery\\Test\\": "tests"
+        }
+    },
+    "scripts": {
+        "test": "phpunit"
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "0.2-dev"
         }
     },
     "suggest": {
