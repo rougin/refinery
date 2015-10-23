@@ -2,6 +2,12 @@
 
 All Notable changes to `Refinery` will be documented in this file
 
+## [0.1.4](https://github.com/rougin/refinery/compare/v0.1.3...v0.1.4) - 2015-10-23
+
+### Changed
+- Code structure
+- Extensibility
+
 ## [0.1.3](https://github.com/rougin/refinery/compare/v0.1.2...v0.1.3) - 2015-09-18
 
 ### Added
