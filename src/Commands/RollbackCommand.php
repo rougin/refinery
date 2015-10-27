@@ -30,13 +30,7 @@ class RollbackCommand extends AbstractCommand
      */
     public function isEnabled()
     {
-        $migrations = glob(APPPATH . 'migrations/*.php');
-
-        if (count($migrations) > 0) {
-            return TRUE;
-        }
-
-        return FALSE;
+        return Tools::isEnabled();
     }
 
     /**

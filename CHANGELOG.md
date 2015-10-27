@@ -17,7 +17,7 @@ All Notable changes to `Refinery` will be documented in this file
 - Commands
 - Simplified code structure
 
-## [0.1.2](https://github.com/rougin/refinery/compare/v0.1.0...v0.1.2) - 2015-09-18
+## [0.1.2](https://github.com/rougin/refinery/compare/v0.1.1...v0.1.2) - 2015-09-18
 
 ### Added
 - [`rougin/spark-plug`](https://github.com/rougin/spark-plug) as a dependency

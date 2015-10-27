@@ -102,7 +102,6 @@ class CreateMigrationCommand extends AbstractCommand
         }
 
         $fileName = $path . '/' . date('YmdHis') . '_' . $name . '.php';
-        $sequence = '';
 
         $isSequential = strpos(
             file_get_contents(APPPATH . '/config/migration.php'),
@@ -138,6 +137,7 @@ class CreateMigrationCommand extends AbstractCommand
             return $output->writeln('<error>' . $message . '</error>');
         }
 
+        $data = [];
         $data['columns'] = [];
         $data['command'] = $keywords[0];
         $data['defaultColumns'] = [];
@@ -196,6 +196,7 @@ class CreateMigrationCommand extends AbstractCommand
 
         $file = fopen($fileName, 'wb');
         file_put_contents($fileName, $template);
+        fclose($file);
 
         $fileName = str_replace($path . '/', '', $fileName);
         $message = '"' . $fileName . '" has been created.';

@@ -30,13 +30,7 @@ class MigrateCommand extends AbstractCommand
      */
     public function isEnabled()
     {
-        $migrations = glob(APPPATH . 'migrations/*.php');
-
-        if (count($migrations) > 0) {
-            return TRUE;
-        }
-
-        return FALSE;
+        return Tools::isEnabled();
     }
 
     /**
@@ -79,7 +73,6 @@ class MigrateCommand extends AbstractCommand
 
         $end = count($migrations) - 1;
         $latest = $migrations[$end];
-        $latestFile = $filenames[$end];
 
         // Enable migration and change the current version to a latest one
         Tools::toggleMigration(TRUE);
@@ -97,7 +90,9 @@ class MigrateCommand extends AbstractCommand
             return $output->writeln('<info>' . $message . '</info>');
         }
 
-        for ($counter = 0; $counter < count($migrations); $counter++) {
+        $migrationsCount = count($migrations);
+
+        for ($counter = 0; $counter < $migrationsCount; $counter++) {
             if ($current >= $migrations[$counter]) {
                 continue;
             }

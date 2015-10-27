@@ -1,8 +1,5 @@
 <?php
 
-// Include the Composer Autoloader
-require realpath('vendor') . '/autoload.php';
-
 // Load the Blueprint library
 $refinery = new Rougin\Blueprint\Blueprint(
     new Symfony\Component\Console\Application,

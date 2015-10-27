@@ -100,6 +100,22 @@ class Tools
     }
 
     /**
+     * Checks whether the command is enabled or not in the current environment.
+     *
+     * @return bool
+     */
+    public static function isEnabled()
+    {
+        $migrations = glob(APPPATH . 'migrations/*.php');
+
+        if (count($migrations) > 0) {
+            return TRUE;
+        }
+
+        return FALSE;
+    }
+
+    /**
      * Enables/disables the Migration Class.
      * 
      * @param  boolean $enabled
