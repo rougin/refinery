@@ -2,10 +2,9 @@
 
 namespace Rougin\Refinery;
 
+use Twig_Environment;
 use Rougin\Describe\Describe;
 use Symfony\Component\Console\Command\Command;
-use Twig_Environment;
-use CI_Controller;
 
 /**
  * Abstract Command
@@ -18,23 +17,24 @@ use CI_Controller;
  */
 abstract class AbstractCommand extends Command
 {
-    protected $codeigniter;
+    /**
+     * @var \Rougin\Describe\Describe
+     */
     protected $describe;
+
+    /**
+     * @var \Twig_Environment
+     */
     protected $renderer;
 
     /**
-     * @param Instance         $codeigniter
-     * @param Describe         $describe
-     * @param Twig_Environment $renderer
+     * @param \Rougin\Describe\Describe $describe
+     * @param \Twig_Environment         $renderer
      */
-    public function __construct(
-        CI_Controller $codeigniter,
-        Describe $describe,
-        Twig_Environment $renderer
-    ) {
+    public function __construct(Describe $describe, Twig_Environment $renderer)
+    {
         parent::__construct();
 
-        $this->codeigniter = $codeigniter;
         $this->describe = $describe;
         $this->renderer = $renderer;
     }

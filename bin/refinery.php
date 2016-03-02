@@ -12,13 +12,7 @@ $refinery
     ->setCommandNamespace('Rougin\Refinery\Commands');
 
 $refinery->console->setName('Refinery');
-$refinery->console->setVersion('0.1.3');
-
-$refinery->injector->delegate('CI_Controller', function () {
-    $sparkPlug = new Rougin\SparkPlug\SparkPlug($GLOBALS, $_SERVER);
-
-    return $sparkPlug->getCodeIgniter();
-});
+$refinery->console->setVersion('0.1.4');
 
 $refinery->injector->delegate('Rougin\Describe\Describe', function () use ($db) {
     return new Rougin\Describe\Describe(

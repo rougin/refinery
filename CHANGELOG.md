@@ -2,6 +2,14 @@
 
 All Notable changes to `Refinery` will be documented in this file
 
+## [0.1.5](https://github.com/rougin/refinery/compare/v0.1.4...v0.1.5) - 2016-03-03
+
+### Changed
+- From `Rougin\SparkPlug\SparkPlug` to CodeIgniter's `get_instance()`
+
+### Fixed
+- Issue in getting CodeIgniter's instance
+
 ## [0.1.4](https://github.com/rougin/refinery/compare/v0.1.3...v0.1.4) - 2015-10-23
 
 ### Changed
