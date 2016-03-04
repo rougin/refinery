@@ -35,6 +35,7 @@ abstract class AbstractCommand extends Command
     {
         parent::__construct();
 
+        $this->codeigniter = get_instance();
         $this->describe = $describe;
         $this->renderer = $renderer;
     }

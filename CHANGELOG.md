@@ -2,6 +2,11 @@
 
 All Notable changes to `Refinery` will be documented in this file
 
+## [0.1.6](https://github.com/rougin/refinery/compare/v0.1.5...v0.1.6) - 2016-03-05
+
+### Fixed
+- Forgot code `$this->codeigniter = get_instance();` in `AbstractCommand`
+
 ## [0.1.5](https://github.com/rougin/refinery/compare/v0.1.4...v0.1.5) - 2016-03-03
 
 ### Changed
