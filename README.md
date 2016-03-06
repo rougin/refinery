@@ -41,6 +41,8 @@ class Migration_create_user_table extends CI_Migration {
 }
 ```
 
+**NOTE**: Use `--from-database` option if you want to create a migration of a table from a database. The connecting of a database is based on the credentials provided in `config/database.php`.
+
 ```bash
 $ php vendor/bin/refinery create add_name_in_user_table
 "20150607123510_add_name_in_user_table.php" has been created.
