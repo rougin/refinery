@@ -40,18 +40,9 @@ class MigrateCommand extends AbstractCommand
      */
     protected function configure()
     {
-        $this->setName('migrate')
-            ->setDescription('Migrates the database')
-            ->addArgument(
-                'version',
-                InputArgument::OPTIONAL,
-                'Migrates to a specified version of the database'
-            )->addOption(
-                'revert',
-                NULL,
-                InputOption::VALUE_OPTIONAL,
-                'Number of times to revert from the list of migrations'
-            );
+        $this
+            ->setName('migrate')
+            ->setDescription('Migrates the database');
     }
 
     /**
