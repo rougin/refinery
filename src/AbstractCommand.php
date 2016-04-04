@@ -28,6 +28,11 @@ abstract class AbstractCommand extends Command
     protected $renderer;
 
     /**
+     * @var \CI_Controller
+     */
+    protected $codeigniter;
+
+    /**
      * @param \Rougin\Describe\Describe $describe
      * @param \Twig_Environment         $renderer
      */
