@@ -18,14 +18,15 @@
         }
     ],
     "require": {
-        "php": ">=5.3.0",
-        "rougin/blueprint": "0.1.*",
-        "rougin/describe": "1.2.*",
-        "rougin/spark-plug": "0.2.*"
+        "php": ">=5.4.0",
+        "rougin/blueprint": "^0.1.5",
+        "rougin/describe": "^1.4",
+        "rougin/spark-plug": "^0.4.2"
     },
     "require-dev": {
         "phpunit/phpunit" : "4.*",
-        "scrutinizer/ocular": "~1.1"
+        "scrutinizer/ocular": "~1.1",
+        "rougin/codeigniter": "^3.0.0"
     },
     "bin": ["bin/refinery", "bin/refinery.php"],
     "autoload": {
@@ -35,7 +36,7 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "Rougin\\Refinery\\Test\\": "tests"
+            "Rougin\\Refinery\\": "tests"
         }
     },
     "scripts": {
@@ -47,7 +48,7 @@
         }
     },
     "suggest": {
-        "rougin/codeigniter": "Yet another way to install CodeIgniter via Composer",
-        "rougin/combustor": "A tool for speeding up web development in CodeIgniter"
+        "rougin/codeigniter": "Installs CodeIgniter core through Composer",
+        "rougin/combustor": "Lets you generate controllers, models, and views from database tables for CodeIgniter"
     }
 }

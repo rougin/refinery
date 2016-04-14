@@ -3,15 +3,16 @@
 namespace Rougin\Refinery\Commands;
 
 use FilesystemIterator;
-use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
-use Rougin\Refinery\AbstractCommand;
-use Rougin\Describe\Column;
-use Rougin\Describe\Describe;
+use RecursiveDirectoryIterator;
+
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+
+use Rougin\Describe\Column;
+use Rougin\Describe\Describe;
 
 /**
  * Create Migration Command
@@ -23,6 +24,16 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class CreateMigrationCommand extends AbstractCommand
 {
+    /**
+     * Checks whether the command is enabled or not in the current environment.
+     *
+     * @return bool
+     */
+    public function isEnabled()
+    {
+        return true;
+    }
+
     /**
      * Sets the configurations of the specified command.
      *
@@ -38,49 +49,56 @@ class CreateMigrationCommand extends AbstractCommand
                 'Name of the migration file'
             )->addOption(
                 'from-database',
-                NULL,
+                null,
                 InputOption::VALUE_NONE,
                 'Generates a migration based from the database'
             )->addOption(
                 'sequential',
-                NULL,
+                null,
                 InputOption::VALUE_NONE,
                 'Generates a migration file with a sequential identifier'
             )->addOption(
                 'type',
-                NULL,
+                null,
                 InputOption::VALUE_OPTIONAL,
-                'Data type of the column'
+                'Data type of the column',
+                'varchar'
             )->addOption(
                 'length',
-                NULL,
+                null,
                 InputOption::VALUE_OPTIONAL,
-                'Length of the column'
+                'Length of the column',
+                50
             )->addOption(
                 'auto_increment',
-                NULL,
-                InputOption::VALUE_NONE,
-                'Generates an "AUTO_INCREMENT" flag on the column'
+                null,
+                InputOption::VALUE_OPTIONAL,
+                'Generates an "AUTO_INCREMENT" flag on the column',
+                false
             )->addOption(
                 'default',
-                NULL,
+                null,
                 InputOption::VALUE_OPTIONAL,
-                'Generates a default value in the column definition'
+                'Generates a default value in the column definition',
+                ''
             )->addOption(
                 'null',
-                NULL,
-                InputOption::VALUE_NONE,
-                'Generates a "NULL" value in the column definition'
+                null,
+                InputOption::VALUE_OPTIONAL,
+                'Generates a "NULL" value in the column definition',
+                false
             )->addOption(
                 'primary',
-                NULL,
-                InputOption::VALUE_NONE,
-                'Generates a "PRIMARY" value in the column definition'
+                null,
+                InputOption::VALUE_OPTIONAL,
+                'Generates a "PRIMARY" value in the column definition',
+                false
             )->addOption(
                 'unsigned',
-                NULL,
-                InputOption::VALUE_NONE,
-                'Generates an "UNSIGNED" value in the column definition'
+                null,
+                InputOption::VALUE_OPTIONAL,
+                'Generates an "UNSIGNED" value in the column definition',
+                false
             );
     }
 
@@ -108,13 +126,11 @@ class CreateMigrationCommand extends AbstractCommand
             '$config[\'migration_type\'] = \'timestamp\''
         );
 
-        if ($input->getOption('sequential') || $isSequential === FALSE) {
+        if ($input->getOption('sequential') || $isSequential === false) {
             $number = 1;
 
-            $files = new FilesystemIterator(
-                $path . '/',
-                FilesystemIterator::SKIP_DOTS
-            );
+            $skipDots = FilesystemIterator::SKIP_DOTS;
+            $files = new FilesystemIterator($path . '/', $skipDots);
 
             if ($files != '') {
                 $number += iterator_count($files);
@@ -127,12 +143,14 @@ class CreateMigrationCommand extends AbstractCommand
         $keywords = explode('_', $name);
 
         if (
-            $input->getOption('from-database') &&
-            $keywords[0] != 'create' &&
-            count($keywords) != 3
+            $input->getOption('from-database')
+            && $keywords[0] != 'create'
+            && count($keywords) != 3
         ) {
-            $message = '"--from-database" is only available to ' .
-                '"create_*table*_table" keyword.';
+            $command = '--from-database';
+            $keyword = 'create_*table*_table';
+
+            $message = "$command is only available to $keyword keyword";
 
             return $output->writeln('<error>' . $message . '</error>');
         }
@@ -164,7 +182,7 @@ class CreateMigrationCommand extends AbstractCommand
                 $field = $keywords[1];
                 $data['table'] = (isset($keywords[3])) ? $keywords[3] : '';
 
-                $column = new Column();
+                $column = new Column;
                 $column->setField($field);
 
                 array_push($data['columns'], $this->setColumn($column, $input));
@@ -174,7 +192,7 @@ class CreateMigrationCommand extends AbstractCommand
                 $field = $keywords[1];
                 $data['table'] = (isset($keywords[3])) ? $keywords[3] : '';
 
-                $column = new Column();
+                $column = new Column;
                 $column->setField($field);
 
                 array_push($data['columns'], $this->setColumn($column, $input));
@@ -192,7 +210,7 @@ class CreateMigrationCommand extends AbstractCommand
                 break;
         }
 
-        $template = $this->renderer->render('Migration.template', $data);
+        $template = $this->renderer->render('Migration.tpl', $data);
 
         $file = fopen($fileName, 'wb');
         file_put_contents($fileName, $template);
@@ -213,33 +231,13 @@ class CreateMigrationCommand extends AbstractCommand
      */
     private function setColumn(Column $column, InputInterface $input)
     {
-        $column->setDataType(
-            ($input->getOption('type')) ? $input->getOption('type') : 'varchar'
-        );
-
-        $column->setLength(
-            ($input->getOption('length')) ? $input->getOption('length') : 50
-        );
-
-        $column->setAutoIncrement(
-            ($input->getOption('auto_increment')) ? TRUE : FALSE
-        );
-
-        $column->setDefaultValue(
-            ($input->getOption('default')) ? $input->getOption('default') : ''
-        );
-
-        $column->setNull(
-            ($input->getOption('null')) ? TRUE : FALSE
-        );
-
-        $column->setPrimary(
-            ($input->getOption('primary')) ? TRUE : FALSE
-        );
-
-        $column->setUnsigned(
-            ($input->getOption('unsigned')) ? TRUE : FALSE
-        );
+        $column->setNull($input->getOption('null'));
+        $column->setDataType($input->getOption('type'));
+        $column->setLength($input->getOption('length'));
+        $column->setPrimary($input->getOption('primary'));
+        $column->setUnsigned($input->getOption('unsigned'));
+        $column->setDefaultValue($input->getOption('default'));
+        $column->setAutoIncrement($input->getOption('auto_increment'));
 
         return $column;
     }

@@ -2,13 +2,13 @@
 
 namespace Rougin\Refinery\Commands;
 
-use Rougin\Refinery\AbstractCommand;
-use Rougin\Refinery\Tools;
-use Rougin\SparkPlug\Instance;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+
+use Rougin\SparkPlug\Instance;
+use Rougin\Refinery\Common\MigrationHelper;
 
 /**
  * Rollback Command
@@ -20,19 +20,6 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class RollbackCommand extends AbstractCommand
 {
-    /**
-     * Checks whether the command is enabled or not in the current environment.
-     *
-     * Override this to check for x or y and return false if the command can not
-     * run properly under the current conditions.
-     *
-     * @return bool
-     */
-    public function isEnabled()
-    {
-        return Tools::isEnabled();
-    }
-
     /**
      * Sets the configurations of the specified command.
      *
@@ -58,25 +45,34 @@ class RollbackCommand extends AbstractCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $current = Tools::getLatestVersion(
-            file_get_contents(APPPATH . '/config/migration.php')
-        );
+        $migration = file_get_contents(APPPATH . '/config/migration.php');
+        $current = MigrationHelper::getLatestVersion($migration);
+        $migrationsPath = APPPATH . 'migrations';
 
-        list($filenames, $migrations) = Tools::getMigrations(
-            APPPATH . 'migrations'
-        );
+        list($filenames, $migrations) = MigrationHelper::getMigrations($migrationsPath);
 
         // Might get the latest or the specified version or revert back
-        $end = count($migrations) - 2;
+        $end = count($migrations) - 1;
 
-        if ($end < 0) {
-            $message = 'We can\'t rollback to that specified version.';
+        if (intval($current) <= 0) {
+            $message = 'There\'s nothing to be rollbacked at.';
 
             return $output->writeln('<error>' . $message . '</error>');
         }
 
-        if ($current <= 0) {
-            $message = 'There\'s nothing to be rollbacked at.';
+        $version = $input->getArgument('version');
+        $versionFound = false;
+
+        foreach ($migrations as $migration) {
+            if ($migration == $version || empty($version)) {
+                $versionFound = true;
+
+                break;
+            }
+        }
+
+        if ( ! $versionFound) {
+            $message = "Cannot rollback to version $version.";;
 
             return $output->writeln('<error>' . $message . '</error>');
         }
@@ -84,21 +80,20 @@ class RollbackCommand extends AbstractCommand
         $latest = $migrations[$end];
         $latestFile = $filenames[$end];
 
-        if ($input->getArgument('version')) {
-            $latest = $input->getArgument('version');
+        if ($version) {
+            $latest = $version;
         }
 
         // Enable migration and change the current version to a latest one
-        Tools::toggleMigration(TRUE);
-        Tools::changeVersion($current, $latest);
+        MigrationHelper::toggleMigration(true);
+        MigrationHelper::changeVersion($current, $latest);
 
         $this->codeigniter->load->library('migration');
         $this->codeigniter->migration->current();
 
-        Tools::toggleMigration();
+        MigrationHelper::toggleMigration();
 
-        $message = 'Database is reverted back to version ' .
-            $latest . '. (' . $latestFile . ')';
+        $message = "Database is reverted back to version $latest ($latestFile)";
 
         return $output->writeln('<info>' . $message . '</info>');
     }

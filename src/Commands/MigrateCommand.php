@@ -2,13 +2,13 @@
 
 namespace Rougin\Refinery\Commands;
 
-use Rougin\Refinery\AbstractCommand;
-use Rougin\Refinery\Tools;
-use Rougin\SparkPlug\Instance;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+
+use Rougin\SparkPlug\Instance;
+use Rougin\Refinery\Common\MigrationHelper;
 
 /**
  * Migrate Command
@@ -20,19 +20,6 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class MigrateCommand extends AbstractCommand
 {
-    /**
-     * Checks whether the command is enabled or not in the current environment.
-     *
-     * Override this to check for x or y and return false if the command can not
-     * run properly under the current conditions.
-     *
-     * @return bool
-     */
-    public function isEnabled()
-    {
-        return Tools::isEnabled();
-    }
-
     /**
      * Sets the configurations of the specified command.
      *
@@ -54,25 +41,23 @@ class MigrateCommand extends AbstractCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $current = Tools::getLatestVersion(
-            file_get_contents(APPPATH . '/config/migration.php')
-        );
+        $migration = file_get_contents(APPPATH . '/config/migration.php');
+        $current = MigrationHelper::getLatestVersion($migration);
+        $migrationsPath = APPPATH . 'migrations';
 
-        list($filenames, $migrations) = Tools::getMigrations(
-            APPPATH . 'migrations'
-        );
+        list($filenames, $migrations) = MigrationHelper::getMigrations($migrationsPath);
 
         $end = count($migrations) - 1;
         $latest = $migrations[$end];
 
         // Enable migration and change the current version to a latest one
-        Tools::toggleMigration(TRUE);
-        Tools::changeVersion($current, $latest);
+        MigrationHelper::toggleMigration(true);
+        MigrationHelper::changeVersion($current, $latest);
 
         $this->codeigniter->load->library('migration');
         $this->codeigniter->migration->current();
 
-        Tools::toggleMigration();
+        MigrationHelper::toggleMigration();
 
         // Show messages of migrated files
         if ($current == $latest) {
@@ -89,7 +74,7 @@ class MigrateCommand extends AbstractCommand
             }
 
             $filename = $filenames[$counter];
-            $message = '"' . $filename . '" has been migrated to the database.';
+            $message = "$filename has been migrated to the database";
 
             $output->writeln('<info>' . $message . '</info>');
         }

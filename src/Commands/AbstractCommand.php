@@ -1,10 +1,12 @@
 <?php
 
-namespace Rougin\Refinery;
+namespace Rougin\Refinery\Commands;
 
+use CI_Controller;
 use Twig_Environment;
-use Rougin\Describe\Describe;
 use Symfony\Component\Console\Command\Command;
+
+use Rougin\Describe\Describe;
 
 /**
  * Abstract Command
@@ -33,15 +35,28 @@ abstract class AbstractCommand extends Command
     protected $codeigniter;
 
     /**
+     * @param \CI_Controller            $controller
      * @param \Rougin\Describe\Describe $describe
      * @param \Twig_Environment         $renderer
      */
-    public function __construct(Describe $describe, Twig_Environment $renderer)
+    public function __construct(CI_Controller $codeigniter, Describe $describe, Twig_Environment $renderer)
     {
         parent::__construct();
 
-        $this->codeigniter = get_instance();
+        $this->codeigniter = $codeigniter;
         $this->describe = $describe;
         $this->renderer = $renderer;
+    }
+
+    /**
+     * Checks whether the command is enabled or not in the current environment.
+     *
+     * @return bool
+     */
+    public function isEnabled()
+    {
+        $migrations = glob(APPPATH . 'migrations/*.php');
+
+        return count($migrations) > 0;
     }
 }

@@ -1,22 +1,20 @@
 <?php
 
-namespace Rougin\Refinery;
+namespace Rougin\Refinery\Common;
 
-use CI_Controller;
 use FilesystemIterator;
-use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
-use Rougin\SparkPlug\Instance;
+use RecursiveDirectoryIterator;
 
 /**
- * Tools
+ * Migration Helper
  *
  * Provides common methods used in other commands
  * 
  * @package Refinery
  * @author  Rougin Royce Gutib <rougingutib@gmail.com>
  */
-class Tools
+class MigrationHelper
 {
     /**
      * Changes the migration version.
@@ -51,11 +49,9 @@ class Tools
      */
     public static function getLatestVersion($file)
     {
-        preg_match_all(
-            '/\$config\[\'migration_version\'\] = (\d+);/',
-            $file,
-            $match
-        );
+        $pattern = '/\$config\[\'migration_version\'\] = (\d+);/';
+
+        preg_match_all($pattern, $file, $match);
 
         return $match[1][0];
     }
@@ -71,16 +67,16 @@ class Tools
         $filenames = [];
         $migrations = [];
 
-        // Searches a listing of migration files and sorts them after
-        $directory = new RecursiveDirectoryIterator(
-            $path,
-            FilesystemIterator::SKIP_DOTS
-        );
+        if ( ! is_dir($path)) {
+            return [$filenames, $migrations];
+        }
 
-        $iterator = new RecursiveIteratorIterator(
-            $directory,
-            RecursiveIteratorIterator::SELF_FIRST
-        );
+        $skipDots = FilesystemIterator::SKIP_DOTS;
+        $selfFirst = RecursiveIteratorIterator::SELF_FIRST;
+
+        // Searches a listing of migration files and sorts them after
+        $directory = new RecursiveDirectoryIterator($path, $skipDots);
+        $iterator = new RecursiveIteratorIterator($directory, $selfFirst);
 
         foreach ($iterator as $path) {
             $filenames[] = str_replace('.php', '', $path->getFilename());
@@ -97,22 +93,6 @@ class Tools
         sort($migrations);
 
         return [$filenames, $migrations];
-    }
-
-    /**
-     * Checks whether the command is enabled or not in the current environment.
-     *
-     * @return bool
-     */
-    public static function isEnabled()
-    {
-        $migrations = glob(APPPATH . 'migrations/*.php');
-
-        if (count($migrations) > 0) {
-            return TRUE;
-        }
-
-        return FALSE;
     }
 
     /**

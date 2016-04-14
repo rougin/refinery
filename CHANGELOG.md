@@ -1,6 +1,11 @@
 # Changelog
 
-All Notable changes to `Refinery` will be documented in this file
+All notable changes to `Refinery` will be documented in this file.
+
+## [0.2.0](https://github.com/rougin/refinery/compare/v0.1.6...v0.2.0)
+
+### Added
+- Tests
 
 ## [0.1.6](https://github.com/rougin/refinery/compare/v0.1.5...v0.1.6) - 2016-03-05
 

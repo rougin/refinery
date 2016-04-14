@@ -1,24 +1,50 @@
 <?php
 
-// Load the Blueprint library
-$refinery = new Rougin\Blueprint\Blueprint(
-    new Symfony\Component\Console\Application,
-    new Auryn\Injector
-);
+// Include the Composer Autoloader
+require 'vendor/autoload.php';
 
-$refinery
+// Load the Blueprint library
+$injector = new Auryn\Injector;
+$console = new Symfony\Component\Console\Application;
+$app = new Rougin\Blueprint\Blueprint($console, $injector);
+
+// Application details
+$app->console->setName('Refinery');
+$app->console->setVersion('0.2.0');
+
+$app
     ->setTemplatePath(__DIR__ . '/../src/Templates')
     ->setCommandPath(__DIR__ . '/../src/Commands')
     ->setCommandNamespace('Rougin\Refinery\Commands');
 
-$refinery->console->setName('Refinery');
-$refinery->console->setVersion('0.1.4');
+$app->injector->delegate('CI_Controller', function () {
+    return Rougin\SparkPlug\Instance::create();
+});
 
-$refinery->injector->delegate('Rougin\Describe\Describe', function () use ($db) {
-    return new Rougin\Describe\Describe(
-        new Rougin\Describe\Driver\CodeIgniterDriver($db)
-    );
+$ci = $app->injector->make('CI_Controller');
+
+$app->injector->delegate('Rougin\Describe\Describe', function () use ($ci) {
+    $ci->load->database();
+    $ci->load->helper('inflector');
+
+    $config = [];
+
+    $config['default'] = [
+        'dbdriver' => $ci->db->dbdriver,
+        'hostname' => $ci->db->hostname,
+        'username' => $ci->db->username,
+        'password' => $ci->db->password,
+        'database' => $ci->db->database
+    ];
+
+    if (empty($config['default']['hostname'])) {
+        $config['default']['hostname'] = $ci->db->dsn;
+    }
+
+    $driver = new Rougin\Describe\Driver\CodeIgniterDriver($config);
+
+    return new Rougin\Describe\Describe($driver);
 });
 
 // Run the Refinery console application
-$refinery->run();
+$app->run();
