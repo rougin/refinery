@@ -2,7 +2,7 @@
 
 All notable changes to `Refinery` will be documented in this file.
 
-## [0.2.0](https://github.com/rougin/refinery/compare/v0.1.6...v0.2.0)
+## [0.2.0](https://github.com/rougin/refinery/compare/v0.1.6...v0.2.0) - 2016-04-14
 
 ### Added
 - Tests

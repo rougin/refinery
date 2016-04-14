@@ -132,7 +132,7 @@ class CreateMigrationCommand extends AbstractCommand
             $skipDots = FilesystemIterator::SKIP_DOTS;
             $files = new FilesystemIterator($path . '/', $skipDots);
 
-            if ($files != '') {
+            if (iterator_count($files) > 0) {
                 $number += iterator_count($files);
             }
 
