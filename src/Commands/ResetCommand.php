@@ -14,7 +14,7 @@ use Rougin\Refinery\Common\MigrationHelper;
  * Reset Migration Command
  *
  * Resets all migrations.
- * 
+ *
  * @package Refinery
  * @author  Rougin Royce Gutib <rougingutib@gmail.com>
  */
@@ -33,7 +33,7 @@ class ResetCommand extends AbstractCommand
 
     /**
      * Executes the command.
-     * 
+     *
      * @param  InputInterface  $input
      * @param  OutputInterface $output
      * @return object|OutputInterface

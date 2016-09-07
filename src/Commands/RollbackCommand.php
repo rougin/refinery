@@ -14,7 +14,7 @@ use Rougin\Refinery\Common\MigrationHelper;
  * Rollback Command
  *
  * Returns to a previous/specified migration
- * 
+ *
  * @package Refinery
  * @author  Rougin Royce Gutib <rougingutib@gmail.com>
  */
@@ -38,7 +38,7 @@ class RollbackCommand extends AbstractCommand
 
     /**
      * Executes the command.
-     * 
+     *
      * @param  InputInterface  $input
      * @param  OutputInterface $output
      * @return object|OutputInterface
@@ -71,8 +71,9 @@ class RollbackCommand extends AbstractCommand
             }
         }
 
-        if ( ! $versionFound) {
-            $message = "Cannot rollback to version $version.";;
+        if (! $versionFound) {
+            $message = "Cannot rollback to version $version.";
+            ;
 
             return $output->writeln('<error>' . $message . '</error>');
         }

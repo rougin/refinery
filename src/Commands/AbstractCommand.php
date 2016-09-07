@@ -13,7 +13,7 @@ use Rougin\Describe\Describe;
  *
  * Extends the Symfony\Console\Command class with Twig's renderer,
  * CodeIgniter's instance and Describe.
- * 
+ *
  * @package Refinery
  * @author  Rougin Royce Gutib <rougingutib@gmail.com>
  */

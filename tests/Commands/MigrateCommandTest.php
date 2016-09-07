@@ -52,7 +52,7 @@ class MigrateCommandTest extends PHPUnit_Framework_TestCase
 
     /**
      * Tests "migrate" command.
-     * 
+     *
      * @return void
      */
     public function testMigrateCommand()

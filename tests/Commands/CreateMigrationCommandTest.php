@@ -36,7 +36,7 @@ class CreateMigrationCommandTest extends PHPUnit_Framework_TestCase
 
     /**
      * Tests "create" command in "create" keyword.
-     * 
+     *
      * @return void
      */
     public function testCreateTable()
@@ -56,7 +56,7 @@ class CreateMigrationCommandTest extends PHPUnit_Framework_TestCase
 
     /**
      * Tests "create" command in "create" keyword with "--from-database" option.
-     * 
+     *
      * @return void
      */
     public function testCreateTableFromDatabase()
@@ -76,7 +76,7 @@ class CreateMigrationCommandTest extends PHPUnit_Framework_TestCase
 
     /**
      * Tests "create" command in "create" keyword with "--sequential" option.
-     * 
+     *
      * @return void
      */
     public function testCreateTableWithSequentialOption()
@@ -99,7 +99,7 @@ class CreateMigrationCommandTest extends PHPUnit_Framework_TestCase
 
     /**
      * Tests "create" command in "add" keyword.
-     * 
+     *
      * @return void
      */
     public function testAddColumnInTable()
@@ -119,7 +119,7 @@ class CreateMigrationCommandTest extends PHPUnit_Framework_TestCase
 
     /**
      * Tests "create" command in "modify" keyword.
-     * 
+     *
      * @return void
      */
     public function testModifyColumnInTable()
@@ -139,7 +139,7 @@ class CreateMigrationCommandTest extends PHPUnit_Framework_TestCase
 
     /**
      * Tests other commands with "--from-database" option.
-     * 
+     *
      * @return void
      */
     public function testFromDatabaseError()

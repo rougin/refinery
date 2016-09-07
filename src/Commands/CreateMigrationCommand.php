@@ -18,7 +18,7 @@ use Rougin\Describe\Describe;
  * Create Migration Command
  *
  * Creates a new migration file based on its file name.
- * 
+ *
  * @package Refinery
  * @author  Rougin Royce Gutib <rougingutib@gmail.com>
  */
@@ -104,7 +104,7 @@ class CreateMigrationCommand extends AbstractCommand
 
     /**
      * Executes the command.
-     * 
+     *
      * @param  InputInterface  $input
      * @param  OutputInterface $output
      * @return object|OutputInterface
@@ -115,7 +115,7 @@ class CreateMigrationCommand extends AbstractCommand
         $path = APPPATH . 'migrations';
 
         // Creates a "application/migrations" directory if it doesn't exist yet
-        if ( ! file_exists($path)) {
+        if (! file_exists($path)) {
             mkdir($path);
         }
 
@@ -170,7 +170,7 @@ class CreateMigrationCommand extends AbstractCommand
 
         switch ($data['command']) {
             case 'create':
-                if ( ! $input->getOption('from-database')) {
+                if (! $input->getOption('from-database')) {
                     break;
                 }
 
@@ -224,7 +224,7 @@ class CreateMigrationCommand extends AbstractCommand
 
     /**
      * Sets properties for a specified column
-     * 
+     *
      * @param  Column         $column
      * @param  InputInterface $input
      * @return Column

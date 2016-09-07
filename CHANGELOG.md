@@ -2,6 +2,14 @@
 
 All notable changes to `Refinery` will be documented in this file.
 
+## [0.2.1](https://github.com/rougin/describe/compare/v0.2.0...v0.2.1) - 2016-09-07
+
+### Added
+- StyleCI for conforming code to PSR standards
+
+### Changed
+- Versions of several libraries in `composer.json`
+
 ## [0.2.0](https://github.com/rougin/refinery/compare/v0.1.6...v0.2.0) - 2016-04-14
 
 ### Added

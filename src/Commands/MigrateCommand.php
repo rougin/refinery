@@ -14,7 +14,7 @@ use Rougin\Refinery\Common\MigrationHelper;
  * Migrate Command
  *
  * Migrates the list of migrations found in "application/migrations" directory.
- * 
+ *
  * @package Refinery
  * @author  Rougin Royce Gutib <rougingutib@gmail.com>
  */
@@ -34,7 +34,7 @@ class MigrateCommand extends AbstractCommand
 
     /**
      * Executes the command.
-     * 
+     *
      * @param  InputInterface  $input
      * @param  OutputInterface $output
      * @return object|OutputInterface

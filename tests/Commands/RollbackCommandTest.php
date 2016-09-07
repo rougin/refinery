@@ -59,7 +59,7 @@ class RollbackCommandTest extends PHPUnit_Framework_TestCase
 
     /**
      * Tests "migrate" command.
-     * 
+     *
      * @return void
      */
     public function testRollbackCommand()
@@ -92,7 +92,7 @@ class RollbackCommandTest extends PHPUnit_Framework_TestCase
 
     /**
      * Tests "migrate" command.
-     * 
+     *
      * @return void
      */
     public function testRollbackCommandWithVersion()
@@ -131,7 +131,7 @@ class RollbackCommandTest extends PHPUnit_Framework_TestCase
 
     /**
      * Tests "migrate" command.
-     * 
+     *
      * @return void
      */
     public function testRollbackCommandWithoutMigrations()

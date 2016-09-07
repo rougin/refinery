@@ -1,3 +1,5 @@
 <?php
 
-class User extends CI_Model {}
+class User extends CI_Model
+{
+}

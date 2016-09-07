@@ -7,7 +7,7 @@ use RecursiveDirectoryIterator;
 
 /**
  * CodeIgniter Helper
- * 
+ *
  * @package Refinery
  * @author  Rougin Royce Gutib <rougingutib@gmail.com>
  */
@@ -15,7 +15,7 @@ class CodeIgniterHelper
 {
     /**
      * Sets default configurations.
-     * 
+     *
      * @param  string $appPath
      * @return void
      */
@@ -29,14 +29,14 @@ class CodeIgniterHelper
 
     /**
      * Deletes files in the specified directory.
-     * 
+     *
      * @param  string  $directory
      * @param  boolean $delete
      * @return void
      */
     protected static function emptyDirectory($directory, $delete = false)
     {
-        if ( ! is_dir($directory)) {
+        if (! is_dir($directory)) {
             return;
         }
 

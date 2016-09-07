@@ -10,7 +10,7 @@ use RecursiveDirectoryIterator;
  * Migration Helper
  *
  * Provides common methods used in other commands
- * 
+ *
  * @package Refinery
  * @author  Rougin Royce Gutib <rougingutib@gmail.com>
  */
@@ -18,7 +18,7 @@ class MigrationHelper
 {
     /**
      * Changes the migration version.
-     * 
+     *
      * @param  int $current
      * @param  int $timestamp
      * @return void
@@ -44,7 +44,7 @@ class MigrationHelper
 
     /**
      * Gets the latest migration version
-     * 
+     *
      * @return string
      */
     public static function getLatestVersion($file)
@@ -58,7 +58,7 @@ class MigrationHelper
 
     /**
      * Gets list of migrations from the specified directory.
-     * 
+     *
      * @param  string $path
      * @return array
      */
@@ -67,7 +67,7 @@ class MigrationHelper
         $filenames = [];
         $migrations = [];
 
-        if ( ! is_dir($path)) {
+        if (! is_dir($path)) {
             return [$filenames, $migrations];
         }
 
@@ -82,7 +82,7 @@ class MigrationHelper
             $filenames[] = str_replace('.php', '', $path->getFilename());
             $migration = substr($path->getFilename(), 0, 14);
 
-            if ( ! is_numeric($migration)) {
+            if (! is_numeric($migration)) {
                 $migration = substr($path->getFilename(), 0, 3);
             }
 
@@ -97,11 +97,11 @@ class MigrationHelper
 
     /**
      * Enables/disables the Migration Class.
-     * 
+     *
      * @param  boolean $enabled
      * @return void
      */
-    public static function toggleMigration($enabled = FALSE)
+    public static function toggleMigration($enabled = false)
     {
         $path = APPPATH . '/config/migration.php';
         $migrationFile = file_get_contents($path);
