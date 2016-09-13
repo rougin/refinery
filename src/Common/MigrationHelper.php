@@ -106,12 +106,26 @@ class MigrationHelper
         $path = APPPATH . '/config/migration.php';
         $migrationFile = file_get_contents($path);
 
-        $search = '$config[\'migration_enabled\'] = TRUE;';
-        $replace = '$config[\'migration_enabled\'] = FALSE;';
+        $search = [
+            '$config[\'migration_enabled\'] = TRUE;',
+            '$config[\'migration_enabled\'] = true;',
+        ];
+
+        $replace = [
+            '$config[\'migration_enabled\'] = FALSE;',
+            '$config[\'migration_enabled\'] = false;',
+        ];
 
         if ($enabled) {
-            $search = '$config[\'migration_enabled\'] = FALSE;';
-            $replace = '$config[\'migration_enabled\'] = TRUE;';
+            $search = [
+                '$config[\'migration_enabled\'] = FALSE;',
+                '$config[\'migration_enabled\'] = false;',
+            ];
+
+            $replace = [
+                '$config[\'migration_enabled\'] = TRUE;',
+                '$config[\'migration_enabled\'] = true;',
+            ];
         }
 
         $migrationFile = str_replace($search, $replace, $migrationFile);

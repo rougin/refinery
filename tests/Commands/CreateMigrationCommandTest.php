@@ -152,9 +152,7 @@ class CreateMigrationCommandTest extends PHPUnit_Framework_TestCase
         $command = new CommandTester($this->command);
         $command->execute([ 'name' => $name, '--from-database' => true ]);
 
-        $expected = '--from-database is only available to create_*table*_table keyword' . PHP_EOL;
-
-        $this->assertEquals($expected, $command->getDisplay());
+        $this->assertRegExp('/--from-database is only/', $command->getDisplay());
 
         CodeIgniterHelper::setDefaults($this->appPath);
     }

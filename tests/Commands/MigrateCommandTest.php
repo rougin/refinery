@@ -87,14 +87,14 @@ class MigrateCommandTest extends PHPUnit_Framework_TestCase
         $command = new CommandTester($this->command);
         $command->execute([]);
 
-        $pattern = '/has been migrated to the database$/';
+        $pattern = '/has been migrated to the database/';
         $this->assertRegExp($pattern, $command->getDisplay());
 
         // Migrate
         $command = new CommandTester($this->command);
         $command->execute([]);
 
-        $pattern = '/^Database is up to date.$/';
+        $pattern = '/Database is up to date./';
         $this->assertRegExp($pattern, $command->getDisplay());
 
         // Reset again
