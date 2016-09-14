@@ -21,7 +21,7 @@
         "php": ">=5.4.0",
         "rougin/blueprint": "~0.2",
         "rougin/describe": "~1.5",
-        "rougin/spark-plug": "~0.4"
+        "rougin/spark-plug": "~0.4.2"
     },
     "require-dev": {
         "phpunit/phpunit" : "4.*",
