@@ -76,6 +76,13 @@ class Migration_add_name_in_user_table extends CI_Migration {
 }
 ```
 
+#### Available keywords
+
+* `create` - creates new table
+* `add` - adds new column for a specific table
+* `delete` - deletes specified column from table
+* `modify` - updates the specified column from table
+
 ### Migrate, rollback and reset
 
 ```bash
