@@ -2,17 +2,10 @@
 
 namespace Rougin\Refinery\Commands;
 
-use FilesystemIterator;
-use RecursiveIteratorIterator;
-use RecursiveDirectoryIterator;
-
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-
-use Rougin\Describe\Column;
-use Rougin\Describe\Describe;
 
 /**
  * Create Migration Command
@@ -27,7 +20,7 @@ class CreateMigrationCommand extends AbstractCommand
     /**
      * Checks whether the command is enabled or not in the current environment.
      *
-     * @return bool
+     * @return boolean
      */
     public function isEnabled()
     {
@@ -43,71 +36,57 @@ class CreateMigrationCommand extends AbstractCommand
     {
         $this->setName('create')
             ->setDescription('Creates a new migration file')
-            ->addArgument(
-                'name',
-                InputArgument::REQUIRED,
-                'Name of the migration file'
-            )->addOption(
-                'from-database',
-                null,
-                InputOption::VALUE_NONE,
-                'Generates a migration based from the database'
-            )->addOption(
-                'sequential',
-                null,
-                InputOption::VALUE_NONE,
-                'Generates a migration file with a sequential identifier'
-            )->addOption(
-                'type',
-                null,
-                InputOption::VALUE_OPTIONAL,
-                'Data type of the column',
-                'varchar'
-            )->addOption(
-                'length',
-                null,
-                InputOption::VALUE_OPTIONAL,
-                'Length of the column',
-                50
-            )->addOption(
-                'auto_increment',
-                null,
-                InputOption::VALUE_OPTIONAL,
-                'Generates an "AUTO_INCREMENT" flag on the column',
-                false
-            )->addOption(
-                'default',
-                null,
-                InputOption::VALUE_OPTIONAL,
-                'Generates a default value in the column definition',
-                ''
-            )->addOption(
-                'null',
-                null,
-                InputOption::VALUE_OPTIONAL,
-                'Generates a "NULL" value in the column definition',
-                false
-            )->addOption(
-                'primary',
-                null,
-                InputOption::VALUE_OPTIONAL,
-                'Generates a "PRIMARY" value in the column definition',
-                false
-            )->addOption(
-                'unsigned',
-                null,
-                InputOption::VALUE_OPTIONAL,
-                'Generates an "UNSIGNED" value in the column definition',
-                false
-            );
+            ->addArgument('name', InputArgument::REQUIRED, 'Name of the migration file')
+            ->addOption('from-database', null, InputOption::VALUE_NONE, 'Generates a migration based from the database')
+            ->addOption('type', null, InputOption::VALUE_OPTIONAL, 'Data type of the column', 'varchar')
+            ->addOption('length', null, InputOption::VALUE_OPTIONAL, 'Length of the column', 50)
+            ->addOption('auto_increment', null, InputOption::VALUE_OPTIONAL, 'Generates an "AUTO_INCREMENT" flag on the column', false)
+            ->addOption('default', null, InputOption::VALUE_OPTIONAL, 'Generates a default value in the column definition', '')
+            ->addOption('null', null, InputOption::VALUE_OPTIONAL, 'Generates a "NULL" value in the column definition', false)
+            ->addOption('primary', null, InputOption::VALUE_OPTIONAL, 'Generates a "PRIMARY" value in the column definition', false)
+            ->addOption('unsigned', null, InputOption::VALUE_OPTIONAL, 'Generates an "UNSIGNED" value in the column definition', false);
+    }
+
+    /**
+     * Defines the columns to be included in the migration.
+     *
+     * @param  \Symfony\Component\Console\Input\InputInterface $input
+     * @param  array                                           $keywords
+     * @param  array                                           $data
+     * @return array
+     */
+    protected function defineColumns(InputInterface $input, array $keywords, array $data)
+    {
+        $data['columns']  = [];
+        $data['defaults'] = [];
+
+        if ($data['command_name'] == 'create') {
+            if ($input->getOption('from-database') === true) {
+                $data['columns'] = $this->describe->getTable($data['table_name']);
+            }
+
+            return $data;
+        }
+
+        $data['table_name'] = (isset($keywords[3])) ? $keywords[3] : '';
+
+        array_push($data['columns'], $this->setColumn($input, $keywords[1]));
+
+        if ($data['command_name'] == 'modify') {
+            foreach ($this->describe->getTable($data['table_name']) as $column) {
+                $column->getField() != $field || array_push($data['defaults'], $column);
+            }
+        }
+
+        return $data;
     }
 
     /**
      * Executes the command.
      *
-     * @param  InputInterface  $input
-     * @param  OutputInterface $output
-     * @return object|OutputInterface
+     * @param  \Symfony\Component\Console\Input\InputInterface   $input
+     * @param  \Symfony\Component\Console\Output\OutputInterface $output
+     * @return object|\Symfony\Component\Console\Output\OutputInterface
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
@@ -115,122 +94,74 @@ class CreateMigrationCommand extends AbstractCommand
         $path = APPPATH . 'migrations';
 
         // Creates a "application/migrations" directory if it doesn't exist yet
-        if (! file_exists($path)) {
-            mkdir($path);
-        }
+        file_exists($path) || mkdir($path);
 
-        $fileName = $path . '/' . date('YmdHis') . '_' . $name . '.php';
+        $fileName   = date('YmdHis') . '_' . $name . '.php';
+        $migrations = file_get_contents(APPPATH . '/config/migration.php');
 
-        $isSequential = strpos(
-            file_get_contents(APPPATH . '/config/migration.php'),
-            '$config[\'migration_type\'] = \'timestamp\''
-        );
+        // Returns the migration type to be used
+        preg_match('/\$config\[\'migration_type\'\] = \'(.*?)\';/i', $migrations, $match);
 
-        if ($input->getOption('sequential') || $isSequential === false) {
+        if ($match[1] == 'sequential') {
             $number = 1;
 
-            $skipDots = FilesystemIterator::SKIP_DOTS;
-            $files = new FilesystemIterator($path . '/', $skipDots);
+            $files = new \FilesystemIterator($path . '/', \FilesystemIterator::SKIP_DOTS);
 
-            if (iterator_count($files) > 0) {
-                $number += iterator_count($files);
-            }
+            iterator_count($files) <= 0 || $number += iterator_count($files);
 
             $sequence = sprintf('%03d', $number);
-            $fileName = $path . '/' . $sequence . '_' . $name . '.php';
+            $fileName = $sequence . '_' . $name . '.php';
         }
 
         $keywords = explode('_', $name);
 
-        if (
-            $input->getOption('from-database')
-            && $keywords[0] != 'create'
-            && count($keywords) != 3
-        ) {
-            $command = '--from-database';
-            $keyword = 'create_*table*_table';
+        $data = $this->prepareData($input, $keywords);
+        $data = $this->defineColumns($input, $keywords, $data);
 
-            $message = "$command is only available to $keyword keyword";
+        $rendered = $this->renderer->render('Migration.twig', $data);
 
-            return $output->writeln('<error>' . $message . '</error>');
+        $this->filesystem->write('application/migrations/' . $fileName . '.php', $rendered);
+
+        return $output->writeln('<info>"' . $fileName . '" has been created.</info>');
+    }
+
+    /**
+     * Prepares the data to be inserted to the template.
+     *
+     * @param  \Symfony\Component\Console\Input\InputInterface $input
+     * @param  array                                           $keywords
+     * @return array
+     */
+    protected function prepareData(InputInterface $input, array $keywords)
+    {
+        if ($input->getOption('from-database') && $keywords[0] != 'create') {
+            $message = '--from-database is only available to create_*table*_table keyword';
+
+            throw new \InvalidArgumentException($message);
         }
 
         $data = [];
-        $data['columns'] = [];
-        $data['command'] = $keywords[0];
-        $data['defaultColumns'] = [];
-        $data['description'] = str_replace($path . '/', '', $fileName);
-        $data['name'] = $name;
-        $data['table'] = (isset($keywords[1])) ? $keywords[1] : '';
 
-        $data['dataTypes'] = [
-            'string' => 'VARCHAR',
-            'integer' => 'INT'
-        ];
+        $data['command_name'] = $keywords[0];
+        $data['data_types']   = [ 'string' => 'VARCHAR', 'integer' => 'INT' ];
+        $data['class_name']   = underscore($input->getArgument('name'));
+        $data['table_name']   = (isset($keywords[1])) ? $keywords[1] : '';
 
-        switch ($data['command']) {
-            case 'create':
-                if (! $input->getOption('from-database')) {
-                    break;
-                }
-
-                $data['columns'] = $this->describe->getTable($data['table']);
-
-                break;
-            case 'add':
-            case 'delete':
-                $field = $keywords[1];
-                $data['table'] = (isset($keywords[3])) ? $keywords[3] : '';
-
-                $column = new Column;
-                $column->setField($field);
-
-                array_push($data['columns'], $this->setColumn($column, $input));
-
-                break;
-            case 'modify':
-                $field = $keywords[1];
-                $data['table'] = (isset($keywords[3])) ? $keywords[3] : '';
-
-                $column = new Column;
-                $column->setField($field);
-
-                array_push($data['columns'], $this->setColumn($column, $input));
-
-                $table = $this->describe->getTable($data['table']);
-
-                foreach ($table as $column) {
-                    if ($column->getField() == $field) {
-                        array_push($data['defaultColumns'], $column);
-
-                        break;
-                    }
-                }
-
-                break;
-        }
-
-        $template = $this->renderer->render('Migration.tpl', $data);
-
-        $file = fopen($fileName, 'wb');
-        file_put_contents($fileName, $template);
-        fclose($file);
-
-        $fileName = str_replace($path . '/', '', $fileName);
-        $message = '"' . $fileName . '" has been created.';
-
-        return $output->writeln('<info>' . $message . '</info>');
+        return $data;
     }
 
     /**
      * Sets properties for a specified column
      *
-     * @param  Column         $column
-     * @param  InputInterface $input
-     * @return Column
+     * @param  \Symfony\Component\Console\Input\InputInterface $input
+     * @param  string                                          $fieldName 
+     * @return \Rougin\Describe\Column
      */
-    private function setColumn(Column $column, InputInterface $input)
+    protected function setColumn(InputInterface $input, $fieldName)
     {
+        $column = new \Rougin\Describe\Column;
+
+        $column->setField($fieldName);
         $column->setNull($input->getOption('null'));
         $column->setDataType($input->getOption('type'));
         $column->setLength($input->getOption('length'));

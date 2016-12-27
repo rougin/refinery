@@ -1,22 +1,17 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-class Migration_{{ name }} extends CI_Migration {
+class Migration_{{ class_name }} extends CI_Migration {
 
-    /**
-     * Runs the migration
-     *
-     * @return void
-     */
     public function up()
     {
-{% for column in columns if command == 'delete' %}
-        $this->dbforge->drop_column('{{ table }}', '{{ column.field }}');
+{% for column in columns if command_name == 'delete' %}
+        $this->dbforge->drop_column('{{ table_name }}', '{{ column.field }}');
 {% endfor %}
-{% for column in columns if command == 'add' or command == 'create' %}
-        $this->dbforge->{{ command }}_column('{{ table }}', array(
+{% for column in columns if command_name == 'add' or command_name == 'create' %}
+        $this->dbforge->{{ command_name }}_column('{{ table_name }}', array(
             '{{ column.field }}' => array(
-                'type' => '{{ dataTypes[column.dataType] }}',
+                'type' => '{{ data_types[column.dataType] }}',
                 'constraint' => '{{ column.length }}',
                 'auto_increment' => {{ column.isAutoIncrement ? 'TRUE' : 'FALSE' }},
                 'default' => '{{ column.defaultValue }}',
@@ -30,26 +25,21 @@ class Migration_{{ name }} extends CI_Migration {
 
 {% endif %}
 {% endfor %}
-{% if command == 'create' and columns | length <= 0 %}
+{% if command_name == 'create' and columns | length <= 0 %}
         $this->dbforge->add_field('id');
-        $this->dbforge->create_table('{{ table }}');
+        $this->dbforge->create_table('{{ table_name }}');
 {% endif %}
     }
 
-    /**
-     * Reverses the migration
-     *
-     * @return void
-     */
     public function down()
     {
-{% for column in columns if command == 'add' %}
-        $this->dbforge->drop_column('{{ table }}', '{{ column.field }}');
+{% for column in columns if command_name == 'add' %}
+        $this->dbforge->drop_column('{{ table_name }}', '{{ column.field }}');
 {% endfor %}
-{% for column in columns if command == 'delete' %}
-        $this->dbforge->drop_column('{{ table }}', array(
+{% for column in columns if command_name == 'delete' %}
+        $this->dbforge->drop_column('{{ table_name }}', array(
             '{{ column.field }}' => array(
-                'type' => '{{ dataTypes[column.dataType] }}',
+                'type' => '{{ data_types[column.dataType] }}',
                 'constraint' => '{{ column.length }}',
                 'auto_increment' => {{ column.isAutoIncrement ? 'TRUE' : 'FALSE' }},
                 'default' => '{{ column.defaultValue }}',
@@ -62,10 +52,10 @@ class Migration_{{ name }} extends CI_Migration {
         $this->dbforge->add_key('{{ column.field }}', TRUE);
 {% endif %}
 {% endfor %}
-{% for column in defaultColumns %}
-        $this->dbforge->modify_column('{{ table }}', array(
+{% for column in defaults %}
+        $this->dbforge->modify_column('{{ table_name }}', array(
             '{{ column.field }}' => array(
-                'type' => '{{ dataTypes[column.dataType] }}',
+                'type' => '{{ data_types[column.dataType] }}',
                 'constraint' => '{{ column.length }}',
                 'auto_increment' => {{ column.isAutoIncrement ? 'TRUE' : 'FALSE' }},
                 'default' => '{{ column.defaultValue }}',
@@ -79,8 +69,8 @@ class Migration_{{ name }} extends CI_Migration {
 
 {% endif %}
 {% endfor %}
-{% if command == 'create' %}
-        $this->dbforge->drop_table('{{ table }}');
+{% if command_name == 'create' %}
+        $this->dbforge->drop_table('{{ table_name }}');
 {% endif %}
     }
 
