@@ -38,6 +38,7 @@ class CreateMigrationCommand extends AbstractCommand
             ->setDescription('Creates a new migration file')
             ->addArgument('name', InputArgument::REQUIRED, 'Name of the migration file')
             ->addOption('from-database', null, InputOption::VALUE_NONE, 'Generates a migration based from the database')
+            ->addOption('sequential', null, InputOption::VALUE_NONE, 'Generates a migration file with a sequential identifier')
             ->addOption('type', null, InputOption::VALUE_OPTIONAL, 'Data type of the column', 'varchar')
             ->addOption('length', null, InputOption::VALUE_OPTIONAL, 'Length of the column', 50)
             ->addOption('auto_increment', null, InputOption::VALUE_OPTIONAL, 'Generates an "AUTO_INCREMENT" flag on the column', false)
@@ -56,27 +57,27 @@ class CreateMigrationCommand extends AbstractCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $config = $this->filesystem->read('application/config/migration.php');
+
         $name = underscore($input->getArgument('name'));
         $path = APPPATH . 'migrations';
 
-        // Creates a "application/migrations" directory if it doesn't exist yet
         file_exists($path) || mkdir($path);
 
-        $fileName   = date('YmdHis') . '_' . $name . '.php';
-        $migrations = file_get_contents(APPPATH . '/config/migration.php');
+        $fileName = date('YmdHis') . '_' . $name;
 
         // Returns the migration type to be used
-        preg_match('/\$config\[\'migration_type\'\] = \'(.*?)\';/i', $migrations, $match);
+        preg_match('/\$config\[\'migration_type\'\] = \'(.*?)\';/i', $config, $match);
 
         if ($match[1] == 'sequential') {
             $number = 1;
 
-            $files = new \FilesystemIterator($path . '/', \FilesystemIterator::SKIP_DOTS);
+            $files = new \FilesystemIterator($path, \FilesystemIterator::SKIP_DOTS);
 
             iterator_count($files) <= 0 || $number += iterator_count($files);
 
             $sequence = sprintf('%03d', $number);
-            $fileName = $sequence . '_' . $name . '.php';
+            $fileName = $sequence . '_' . $name;
         }
 
         $keywords = explode('_', $name);
@@ -118,7 +119,7 @@ class CreateMigrationCommand extends AbstractCommand
 
         if ($data['command_name'] == 'modify') {
             foreach ($this->describe->getTable($data['table_name']) as $column) {
-                $column->getField() != $field || array_push($data['defaults'], $column);
+                $column->getField() != $keywords[1] || array_push($data['defaults'], $column);
             }
         }
 
@@ -126,7 +127,7 @@ class CreateMigrationCommand extends AbstractCommand
     }
 
     /**
-     * Prepares the data to be inserted to the template.
+     * Prepares the data to be inserted in the template.
      *
      * @param  \Symfony\Component\Console\Input\InputInterface $input
      * @param  array                                           $keywords

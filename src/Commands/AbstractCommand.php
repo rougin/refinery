@@ -47,4 +47,106 @@ abstract class AbstractCommand extends \Symfony\Component\Console\Command\Comman
         $this->filesystem  = $filesystem;
         $this->renderer    = $renderer;
     }
+
+    /**
+     * Changes the migration version.
+     *
+     * @param  integer $current
+     * @param  integer $timestamp
+     * @return void
+     */
+    public function changeVersion($current, $timestamp)
+    {
+        $old = '$config[\'migration_version\'] = ' . $current . ';';
+        $new = '$config[\'migration_version\'] = ' . $timestamp . ';';
+
+        $config = $this->filesystem->read('application/config/migration.php');
+        $config = str_replace($old, $new, $config);
+
+        $this->filesystem->update('application/config/migration.php', $config);
+    }
+
+    /**
+     * Gets the latest migration version
+     *
+     * @return string
+     */
+    public function getLatestVersion()
+    {
+        $config  = $this->filesystem->read('application/config/migration.php');
+        $pattern = '/\$config\[\'migration_version\'\] = (\d+);/';
+
+        preg_match_all($pattern, $config, $match);
+
+        return $match[1][0];
+    }
+
+    /**
+     * Gets list of migrations from the specified directory.
+     *
+     * @param  string $path
+     * @return array
+     */
+    public function getMigrations($path)
+    {
+        $filenames  = [];
+        $migrations = [];
+
+        if (! is_dir($path)) {
+            return [ $filenames, $migrations ];
+        }
+
+        // Searches a listing of migration files and sorts them after
+        $directory = new \RecursiveDirectoryIterator($path, \FilesystemIterator::SKIP_DOTS);
+        $iterator  = new \RecursiveIteratorIterator($directory, \RecursiveIteratorIterator::SELF_FIRST);
+
+        foreach ($iterator as $path) {
+            array_push($filenames, str_replace('.php', '', $path->getFilename()));
+
+            $migration = substr($path->getFilename(), 0, 14);
+
+            is_numeric($migration) || $migration = substr($path->getFilename(), 0, 3);
+
+            array_push($migrations, $migration);
+        }
+
+        sort($filenames);
+        sort($migrations);
+
+        return [ $filenames, $migrations ];
+    }
+
+    /**
+     * Checks whether the command is enabled or not in the current environment.
+     *
+     * @return boolean
+     */
+    public function isEnabled()
+    {
+        $migrations = glob(APPPATH . 'migrations/*.php');
+
+        return count($migrations) > 0;
+    }
+
+    /**
+     * Enables/disables the Migration Class.
+     *
+     * @param  boolean $enabled
+     * @return void
+     */
+    public function toggleMigration($enabled = false)
+    {
+        $old = [ '$config[\'migration_enabled\'] = TRUE;', '$config[\'migration_enabled\'] = true;' ];
+        $new = [ '$config[\'migration_enabled\'] = FALSE;', '$config[\'migration_enabled\'] = false;' ];
+
+        if ($enabled) {
+            $old = [ '$config[\'migration_enabled\'] = FALSE;', '$config[\'migration_enabled\'] = false;' ];
+            $new = [ '$config[\'migration_enabled\'] = TRUE;', '$config[\'migration_enabled\'] = true;' ];
+        }
+
+        $config = $this->filesystem->read('application/config/migration.php');
+        $config = str_replace($old, $new, $config);
+
+        $this->filesystem->update('application/config/migration.php', $config);
+    }
 }

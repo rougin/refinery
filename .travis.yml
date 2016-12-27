@@ -6,17 +6,8 @@ php:
   - 5.6
   - 7.0
 
-# This triggers builds to run on the new TravisCI infrastructure.
-# See: http://docs.travis-ci.com/user/workers/container-based-infrastructure/
-dist: trusty
-group: edge
-sudo: true
-addons:
-  apt:
-    packages:
-    - mysql-server-5.6
-    - mysql-client-core-5.6
-    - mysql-client-5.6
+services:
+  - mysql
 
 matrix:
   allow_failures:
@@ -27,6 +18,7 @@ matrix:
 
 before_script:
   - mysql -u root -e 'CREATE DATABASE demo;'
+  - mysql -u root -e 'USE demo; CREATE TABLE IF NOT EXISTS `user` ( `id` int(10) NOT NULL AUTO_INCREMENT, `name` varchar(200) NOT NULL, `age` int(2) NOT NULL, `gender` varchar(10) NOT NULL, PRIMARY KEY (`id`) ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1;'
   - travis_retry composer self-update
   - travis_retry composer update ${COMPOSER_FLAGS} --no-interaction --prefer-source
 
