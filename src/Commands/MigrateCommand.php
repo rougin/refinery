@@ -50,17 +50,19 @@ class MigrateCommand extends AbstractCommand
 
         // Show messages of migrated files
         if ($current != $latest) {
-            for ($counter = 0; $counter < count($migrations); $counter++) {
+            $count = count($migrations);
+
+            for ($counter = 0; $counter < $count; $counter++) {
                 if ($current >= $migrations[$counter]) {
                     continue;
                 }
 
                 $message = $filenames[$counter] . ' has been migrated to the database.';
 
-                return $output->writeln('<info>' . $message . '</info>');
+                $output->writeln('<info>' . $message . '</info>');
             }
+        } else {
+            $output->writeln('<info>Database is up to date.</info>');
         }
-
-        return $output->writeln('<info>Database is up to date.</info>');
     }
 }

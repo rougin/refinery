@@ -2,7 +2,7 @@
 
 All notable changes to `Refinery` will be documented in this file.
 
-## [1.0.0](https://github.com/rougin/describe/compare/v0.2.1...v1.0.0) - Unreleased
+## [0.3.0](https://github.com/rougin/describe/compare/v0.2.1...v0.3.0) - Unreleased
 
 ### Changed
 - Improve code quality

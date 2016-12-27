@@ -69,7 +69,7 @@ class CreateMigrationCommand extends AbstractCommand
         // Returns the migration type to be used
         preg_match('/\$config\[\'migration_type\'\] = \'(.*?)\';/i', $config, $match);
 
-        if ($match[1] == 'sequential') {
+        if ($match[1] == 'sequential' || $input->getOption('sequential')) {
             $number = 1;
 
             $files = new \FilesystemIterator($path, \FilesystemIterator::SKIP_DOTS);
@@ -155,7 +155,7 @@ class CreateMigrationCommand extends AbstractCommand
      * Sets properties for a specified column
      *
      * @param  \Symfony\Component\Console\Input\InputInterface $input
-     * @param  string                                          $fieldName 
+     * @param  string                                          $fieldName
      * @return \Rougin\Describe\Column
      */
     protected function setColumn(InputInterface $input, $fieldName)

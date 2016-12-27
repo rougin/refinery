@@ -34,6 +34,7 @@ abstract class AbstractCommand extends \Symfony\Component\Console\Command\Comman
     protected $renderer;
 
     /**
+     * @param \CI_Controller               $codeigniter
      * @param \Rougin\Describe\Describe    $describe
      * @param \League\Flysystem\Filesystem $filesystem
      * @param \Twig_Environment            $renderer
@@ -91,10 +92,6 @@ abstract class AbstractCommand extends \Symfony\Component\Console\Command\Comman
     {
         $filenames  = [];
         $migrations = [];
-
-        if (! is_dir($path)) {
-            return [ $filenames, $migrations ];
-        }
 
         // Searches a listing of migration files and sorts them after
         $directory = new \RecursiveDirectoryIterator($path, \FilesystemIterator::SKIP_DOTS);
