@@ -52,6 +52,8 @@ class TestCase extends \PHPUnit_Framework_TestCase
         $this->migrateCommand  = $this->buildCommand('Rougin\Refinery\Commands\MigrateCommand');
         $this->resetCommand    = $this->buildCommand('Rougin\Refinery\Commands\ResetCommand');
         $this->rollbackCommand = $this->buildCommand('Rougin\Refinery\Commands\RollbackCommand');
+
+        \Rougin\Refinery\Refinery::boot();
     }
 
     /**
