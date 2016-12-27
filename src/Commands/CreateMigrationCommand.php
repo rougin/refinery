@@ -48,40 +48,6 @@ class CreateMigrationCommand extends AbstractCommand
     }
 
     /**
-     * Defines the columns to be included in the migration.
-     *
-     * @param  \Symfony\Component\Console\Input\InputInterface $input
-     * @param  array                                           $keywords
-     * @param  array                                           $data
-     * @return array
-     */
-    protected function defineColumns(InputInterface $input, array $keywords, array $data)
-    {
-        $data['columns']  = [];
-        $data['defaults'] = [];
-
-        if ($data['command_name'] == 'create') {
-            if ($input->getOption('from-database') === true) {
-                $data['columns'] = $this->describe->getTable($data['table_name']);
-            }
-
-            return $data;
-        }
-
-        $data['table_name'] = (isset($keywords[3])) ? $keywords[3] : '';
-
-        array_push($data['columns'], $this->setColumn($input, $keywords[1]));
-
-        if ($data['command_name'] == 'modify') {
-            foreach ($this->describe->getTable($data['table_name']) as $column) {
-                $column->getField() != $field || array_push($data['defaults'], $column);
-            }
-        }
-
-        return $data;
-    }
-
-    /**
      * Executes the command.
      *
      * @param  \Symfony\Component\Console\Input\InputInterface   $input
@@ -123,6 +89,40 @@ class CreateMigrationCommand extends AbstractCommand
         $this->filesystem->write('application/migrations/' . $fileName . '.php', $rendered);
 
         return $output->writeln('<info>"' . $fileName . '" has been created.</info>');
+    }
+
+    /**
+     * Defines the columns to be included in the migration.
+     *
+     * @param  \Symfony\Component\Console\Input\InputInterface $input
+     * @param  array                                           $keywords
+     * @param  array                                           $data
+     * @return array
+     */
+    protected function defineColumns(InputInterface $input, array $keywords, array $data)
+    {
+        $data['columns']  = [];
+        $data['defaults'] = [];
+
+        if ($data['command_name'] == 'create') {
+            if ($input->getOption('from-database') === true) {
+                $data['columns'] = $this->describe->getTable($data['table_name']);
+            }
+
+            return $data;
+        }
+
+        $data['table_name'] = (isset($keywords[3])) ? $keywords[3] : '';
+
+        array_push($data['columns'], $this->setColumn($input, $keywords[1]));
+
+        if ($data['command_name'] == 'modify') {
+            foreach ($this->describe->getTable($data['table_name']) as $column) {
+                $column->getField() != $field || array_push($data['defaults'], $column);
+            }
+        }
+
+        return $data;
     }
 
     /**
