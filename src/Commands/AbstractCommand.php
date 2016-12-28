@@ -2,27 +2,31 @@
 
 namespace Rougin\Refinery\Commands;
 
-use CI_Controller;
-use Twig_Environment;
-use Symfony\Component\Console\Command\Command;
-
 use Rougin\Describe\Describe;
+use League\Flysystem\Filesystem;
 
 /**
  * Abstract Command
  *
- * Extends the Symfony\Console\Command class with Twig's renderer,
- * CodeIgniter's instance and Describe.
- *
  * @package Refinery
  * @author  Rougin Royce Gutib <rougingutib@gmail.com>
  */
-abstract class AbstractCommand extends Command
+abstract class AbstractCommand extends \Symfony\Component\Console\Command\Command
 {
+    /**
+     * @var \CI_Controller
+     */
+    protected $codeigniter;
+
     /**
      * @var \Rougin\Describe\Describe
      */
     protected $describe;
+
+    /**
+     * @var \League\Flysystem\Filesystem
+     */
+    protected $filesystem;
 
     /**
      * @var \Twig_Environment
@@ -30,33 +34,116 @@ abstract class AbstractCommand extends Command
     protected $renderer;
 
     /**
-     * @var \CI_Controller
+     * @param \CI_Controller               $codeigniter
+     * @param \Rougin\Describe\Describe    $describe
+     * @param \League\Flysystem\Filesystem $filesystem
+     * @param \Twig_Environment            $renderer
      */
-    protected $codeigniter;
-
-    /**
-     * @param \CI_Controller            $controller
-     * @param \Rougin\Describe\Describe $describe
-     * @param \Twig_Environment         $renderer
-     */
-    public function __construct(CI_Controller $codeigniter, Describe $describe, Twig_Environment $renderer)
+    public function __construct(\CI_Controller $codeigniter, Describe $describe, Filesystem $filesystem, \Twig_Environment $renderer)
     {
         parent::__construct();
 
         $this->codeigniter = $codeigniter;
-        $this->describe = $describe;
-        $this->renderer = $renderer;
+        $this->describe    = $describe;
+        $this->filesystem  = $filesystem;
+        $this->renderer    = $renderer;
+    }
+
+    /**
+     * Changes the migration version.
+     *
+     * @param  integer $current
+     * @param  integer $timestamp
+     * @return void
+     */
+    public function changeVersion($current, $timestamp)
+    {
+        $old = '$config[\'migration_version\'] = ' . $current . ';';
+        $new = '$config[\'migration_version\'] = ' . $timestamp . ';';
+
+        $config = $this->filesystem->read('application/config/migration.php');
+        $config = str_replace($old, $new, $config);
+
+        $this->filesystem->update('application/config/migration.php', $config);
+    }
+
+    /**
+     * Gets the latest migration version
+     *
+     * @return string
+     */
+    public function getLatestVersion()
+    {
+        $config  = $this->filesystem->read('application/config/migration.php');
+        $pattern = '/\$config\[\'migration_version\'\] = (\d+);/';
+
+        preg_match_all($pattern, $config, $match);
+
+        return $match[1][0];
+    }
+
+    /**
+     * Gets list of migrations from the specified directory.
+     *
+     * @param  string $path
+     * @return array
+     */
+    public function getMigrations($path)
+    {
+        $filenames  = [];
+        $migrations = [];
+
+        // Searches a listing of migration files and sorts them after
+        $directory = new \RecursiveDirectoryIterator($path, \FilesystemIterator::SKIP_DOTS);
+        $iterator  = new \RecursiveIteratorIterator($directory, \RecursiveIteratorIterator::SELF_FIRST);
+
+        foreach ($iterator as $path) {
+            array_push($filenames, str_replace('.php', '', $path->getFilename()));
+
+            $migration = substr($path->getFilename(), 0, 14);
+
+            is_numeric($migration) || $migration = substr($path->getFilename(), 0, 3);
+
+            array_push($migrations, $migration);
+        }
+
+        sort($filenames);
+        sort($migrations);
+
+        return [ $filenames, $migrations ];
     }
 
     /**
      * Checks whether the command is enabled or not in the current environment.
      *
-     * @return bool
+     * @return boolean
      */
     public function isEnabled()
     {
         $migrations = glob(APPPATH . 'migrations/*.php');
 
         return count($migrations) > 0;
+    }
+
+    /**
+     * Enables/disables the Migration Class.
+     *
+     * @param  boolean $enabled
+     * @return void
+     */
+    public function toggleMigration($enabled = false)
+    {
+        $old = [ '$config[\'migration_enabled\'] = TRUE;', '$config[\'migration_enabled\'] = true;' ];
+        $new = [ '$config[\'migration_enabled\'] = FALSE;', '$config[\'migration_enabled\'] = false;' ];
+
+        if ($enabled) {
+            $old = [ '$config[\'migration_enabled\'] = FALSE;', '$config[\'migration_enabled\'] = false;' ];
+            $new = [ '$config[\'migration_enabled\'] = TRUE;', '$config[\'migration_enabled\'] = true;' ];
+        }
+
+        $config = $this->filesystem->read('application/config/migration.php');
+        $config = str_replace($old, $new, $config);
+
+        $this->filesystem->update('application/config/migration.php', $config);
     }
 }

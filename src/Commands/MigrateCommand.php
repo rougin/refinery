@@ -2,13 +2,8 @@
 
 namespace Rougin\Refinery\Commands;
 
-use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-
-use Rougin\SparkPlug\Instance;
-use Rougin\Refinery\Common\MigrationHelper;
 
 /**
  * Migrate Command
@@ -27,56 +22,47 @@ class MigrateCommand extends AbstractCommand
      */
     protected function configure()
     {
-        $this
-            ->setName('migrate')
-            ->setDescription('Migrates the database');
+        $this->setName('migrate')->setDescription('Migrates the database');
     }
 
     /**
      * Executes the command.
      *
-     * @param  InputInterface  $input
-     * @param  OutputInterface $output
-     * @return object|OutputInterface
+     * @param  \Symfony\Component\Console\Input\InputInterface   $input
+     * @param  \Symfony\Component\Console\Output\OutputInterface $output
+     * @return object|\Symfony\Component\Console\Output\OutputInterface
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $migration = file_get_contents(APPPATH . '/config/migration.php');
-        $current = MigrationHelper::getLatestVersion($migration);
-        $migrationsPath = APPPATH . 'migrations';
+        list($filenames, $migrations) = $this->getMigrations(APPPATH . 'migrations');
 
-        list($filenames, $migrations) = MigrationHelper::getMigrations($migrationsPath);
-
-        $end = count($migrations) - 1;
-        $latest = $migrations[$end];
+        $current = $this->getLatestVersion();
+        $latest  = $migrations[count($migrations) - 1];
 
         // Enable migration and change the current version to a latest one
-        MigrationHelper::toggleMigration(true);
-        MigrationHelper::changeVersion($current, $latest);
+        $this->toggleMigration(true);
+        $this->changeVersion($current, $latest);
 
         $this->codeigniter->load->library('migration');
         $this->codeigniter->migration->current();
 
-        MigrationHelper::toggleMigration();
+        $this->toggleMigration();
 
         // Show messages of migrated files
-        if ($current == $latest) {
-            $message = 'Database is up to date.';
+        if ($current != $latest) {
+            $count = count($migrations);
 
-            return $output->writeln('<info>' . $message . '</info>');
-        }
+            for ($counter = 0; $counter < $count; $counter++) {
+                if ($current >= $migrations[$counter]) {
+                    continue;
+                }
 
-        $migrationsCount = count($migrations);
+                $message = $filenames[$counter] . ' has been migrated to the database.';
 
-        for ($counter = 0; $counter < $migrationsCount; $counter++) {
-            if ($current >= $migrations[$counter]) {
-                continue;
+                $output->writeln('<info>' . $message . '</info>');
             }
-
-            $filename = $filenames[$counter];
-            $message = "$filename has been migrated to the database";
-
-            $output->writeln('<info>' . $message . '</info>');
+        } else {
+            $output->writeln('<info>Database is up to date.</info>');
         }
     }
 }

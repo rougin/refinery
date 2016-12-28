@@ -19,9 +19,9 @@
     ],
     "require": {
         "php": ">=5.4.0",
-        "rougin/blueprint": "~0.2",
-        "rougin/describe": "~1.5",
-        "rougin/spark-plug": "~0.4.2"
+        "rougin/blueprint": "~0.5",
+        "rougin/describe": "dev-master",
+        "rougin/spark-plug": "~0.5"
     },
     "require-dev": {
         "phpunit/phpunit" : "4.*",
@@ -47,7 +47,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "0.3-dev"
+            "dev-master": "1.0-dev"
         }
     },
     "suggest": {

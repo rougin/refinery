@@ -2,16 +2,11 @@
 
 namespace Rougin\Refinery\Commands;
 
-use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-use Rougin\SparkPlug\Instance;
-use Rougin\Refinery\Common\MigrationHelper;
-
 /**
- * Reset Migration Command
+ * Reset Command
  *
  * Resets all migrations.
  *
@@ -27,36 +22,31 @@ class ResetCommand extends AbstractCommand
      */
     protected function configure()
     {
-        $this->setName('reset')
-            ->setDescription('Resets all migrations');
+        $this->setName('reset')->setDescription('Resets all migrations');
     }
 
     /**
      * Executes the command.
      *
-     * @param  InputInterface  $input
-     * @param  OutputInterface $output
-     * @return object|OutputInterface
+     * @param  \Symfony\Component\Console\Input\InputInterface   $input
+     * @param  \Symfony\Component\Console\Output\OutputInterface $output
+     * @return object|\Symfony\Component\Console\Output\OutputInterface
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $migration = file_get_contents(APPPATH . '/config/migration.php');
-        $current = MigrationHelper::getLatestVersion($migration);
+        $current = $this->getLatestVersion();
 
         if ($current <= 0) {
-            $message = 'Database\'s version is now in 0.';
-
-            return $output->writeln('<info>' . $message . '</info>');
+            return $output->writeln('<info>Database\'s version is now in 0.</info>');
         }
 
-        // Enables migration and change the current version to 0
-        MigrationHelper::toggleMigration(true);
-        MigrationHelper::changeVersion($current, 0);
+        $this->toggleMigration(true);
+        $this->changeVersion($current, 0);
 
         $this->codeigniter->load->library('migration');
         $this->codeigniter->migration->current();
 
-        MigrationHelper::toggleMigration();
+        $this->toggleMigration();
 
         return $output->writeln('<info>Database has been resetted.</info>');
     }

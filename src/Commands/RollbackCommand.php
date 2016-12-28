@@ -2,18 +2,14 @@
 
 namespace Rougin\Refinery\Commands;
 
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-use Rougin\SparkPlug\Instance;
-use Rougin\Refinery\Common\MigrationHelper;
-
 /**
  * Rollback Command
  *
- * Returns to a previous/specified migration
+ * Returns to a previous or specified migration.
  *
  * @package Refinery
  * @author  Rougin Royce Gutib <rougingutib@gmail.com>
@@ -28,73 +24,60 @@ class RollbackCommand extends AbstractCommand
     protected function configure()
     {
         $this->setName('rollback')
-            ->setDescription('Returns to a previous/specified migration')
-            ->addArgument(
-                'version',
-                InputArgument::OPTIONAL,
-                'Specified version of the migration'
-            );
+            ->setDescription('Returns to a previous or specified migration')
+            ->addArgument('version', InputArgument::OPTIONAL, 'Specified version of the migration');
     }
 
     /**
      * Executes the command.
      *
-     * @param  InputInterface  $input
-     * @param  OutputInterface $output
-     * @return object|OutputInterface
+     * @param  \Symfony\Component\Console\Input\InputInterface   $input
+     * @param  \Symfony\Component\Console\Output\OutputInterface $output
+     * @return object|\Symfony\Component\Console\Output\OutputInterface
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $migration = file_get_contents(APPPATH . '/config/migration.php');
-        $current = MigrationHelper::getLatestVersion($migration);
-        $migrationsPath = APPPATH . 'migrations';
+        list($filenames, $migrations) = $this->getMigrations(APPPATH . 'migrations');
 
-        list($filenames, $migrations) = MigrationHelper::getMigrations($migrationsPath);
-
-        // Might get the latest or the specified version or revert back
-        $end = count($migrations) - 1;
+        $current = $this->getLatestVersion();
+        $end     = count($migrations) - 1;
 
         if (intval($current) <= 0) {
-            $message = 'There\'s nothing to be rollbacked at.';
-
-            return $output->writeln('<error>' . $message . '</error>');
+            return $output->writeln('<error>There\'s nothing to be rollbacked at.</error>');
         }
 
         $version = $input->getArgument('version');
-        $versionFound = false;
+        $found   = false;
 
         foreach ($migrations as $migration) {
             if ($migration == $version || empty($version)) {
-                $versionFound = true;
+                $found = true;
 
                 break;
             }
         }
 
-        if (! $versionFound) {
-            $message = "Cannot rollback to version $version.";
-            ;
-
-            return $output->writeln('<error>' . $message . '</error>');
+        if (! $found) {
+            return $output->writeln('<error>Cannot rollback to version ' . $version . '.</error>');
         }
 
-        $latest = $migrations[$end];
-        $latestFile = $filenames[$end];
+        $migration = $migrations[$end];
+        $fileName  = $filenames[$end];
 
         if ($version) {
-            $latest = $version;
+            $migration = $version;
         }
 
         // Enable migration and change the current version to a latest one
-        MigrationHelper::toggleMigration(true);
-        MigrationHelper::changeVersion($current, $latest);
+        $this->toggleMigration(true);
+        $this->changeVersion($current, $migration);
 
         $this->codeigniter->load->library('migration');
         $this->codeigniter->migration->current();
 
-        MigrationHelper::toggleMigration();
+        $this->toggleMigration();
 
-        $message = "Database is reverted back to version $latest ($latestFile)";
+        $message = "Database is reverted back to version $migration ($fileName)";
 
         return $output->writeln('<info>' . $message . '</info>');
     }

@@ -1,0 +1,77 @@
+<?php
+defined('BASEPATH') OR exit('No direct script access allowed');
+
+class Migration_{{ class_name }} extends CI_Migration {
+
+	public function up()
+	{
+{% for column in columns if command_name == 'delete' %}
+		$this->dbforge->drop_column('{{ table_name }}', '{{ column.field }}');
+{% endfor %}
+{% for column in columns if command_name == 'add' or command_name == 'create' %}
+		$this->dbforge->{{ command_name }}_column('{{ table_name }}', array(
+			'{{ column.field }}' => array(
+				'type' => '{{ data_types[column.dataType] }}',
+				'constraint' => '{{ column.length }}',
+				'auto_increment' => {{ column.isAutoIncrement ? 'TRUE' : 'FALSE' }},
+				'default' => '{{ column.defaultValue }}',
+				'null' => {{ column.isNull ? 'TRUE' : 'FALSE' }},
+				'unsigned' => {{ column.isUnsigned ? 'TRUE' : 'FALSE' }}
+			)
+		));
+
+{% if column.isPrimary %}
+		$this->dbforge->add_key('{{ column.field }}', TRUE);
+
+{% endif %}
+{% endfor %}
+{% if command_name == 'create' and columns | length <= 0 %}
+		$this->dbforge->add_field('id');
+		$this->dbforge->create_table('{{ table_name }}');
+{% endif %}
+	}
+
+	public function down()
+	{
+{% for column in columns if command_name == 'add' %}
+		$this->dbforge->drop_column('{{ table_name }}', '{{ column.field }}');
+{% endfor %}
+{% for column in columns if command_name == 'delete' %}
+		$this->dbforge->drop_column('{{ table_name }}', array(
+			'{{ column.field }}' => array(
+				'type' => '{{ data_types[column.dataType] }}',
+				'constraint' => '{{ column.length }}',
+				'auto_increment' => {{ column.isAutoIncrement ? 'TRUE' : 'FALSE' }},
+				'default' => '{{ column.defaultValue }}',
+				'null' => {{ column.isNull ? 'TRUE' : 'FALSE' }},
+				'unsigned' => {{ column.isUnsigned ? 'TRUE' : 'FALSE' }}
+			)
+		));
+
+{% if column.isPrimary %}
+		$this->dbforge->add_key('{{ column.field }}', TRUE);
+{% endif %}
+{% endfor %}
+{% for column in defaults %}
+		$this->dbforge->modify_column('{{ table_name }}', array(
+			'{{ column.field }}' => array(
+				'type' => '{{ data_types[column.dataType] }}',
+				'constraint' => '{{ column.length }}',
+				'auto_increment' => {{ column.isAutoIncrement ? 'TRUE' : 'FALSE' }},
+				'default' => '{{ column.defaultValue }}',
+				'null' => {{ column.isNull ? 'TRUE' : 'FALSE' }},
+				'unsigned' => {{ column.isUnsigned ? 'TRUE' : 'FALSE' }}
+			)
+		));
+
+{% if column.isPrimary %}
+		$this->dbforge->add_key('{{ column.field }}', TRUE);
+
+{% endif %}
+{% endfor %}
+{% if command_name == 'create' %}
+		$this->dbforge->drop_table('{{ table_name }}');
+{% endif %}
+	}
+
+}

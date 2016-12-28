@@ -4,36 +4,8 @@ namespace Rougin\Refinery\Commands;
 
 use Symfony\Component\Console\Tester\CommandTester;
 
-use Rougin\Refinery\Fixture\CommandBuilder;
-use Rougin\Refinery\Fixture\CodeIgniterHelper;
-
-use PHPUnit_Framework_TestCase;
-
-class CreateMigrationCommandTest extends PHPUnit_Framework_TestCase
+class CreateMigrationCommandTest extends \Rougin\Refinery\TestCase
 {
-    /**
-     * @var \Symfony\Component\Console\Command\Command
-     */
-    protected $command;
-
-    /**
-     * @var string
-     */
-    protected $appPath;
-
-    /**
-     * Sets up the command and the application path.
-     *
-     * @return void
-     */
-    public function setUp()
-    {
-        $this->appPath = __DIR__ . '/../TestApp/application';
-        $command = 'Rougin\Refinery\Commands\CreateMigrationCommand';
-
-        $this->command = CommandBuilder::create($command);
-    }
-
     /**
      * Tests "create" command in "create" keyword.
      *
@@ -41,17 +13,17 @@ class CreateMigrationCommandTest extends PHPUnit_Framework_TestCase
      */
     public function testCreateTable()
     {
-        CodeIgniterHelper::setDefaults($this->appPath);
+        $this->setDefaults();
 
         $name = 'create_user_table';
         $file = APPPATH . 'migrations/' . date('YmdHis') . '_' . $name . '.php';
 
-        $command = new CommandTester($this->command);
-        $command->execute([ 'name' => $name ]);
+        $createCommand = new CommandTester($this->createCommand);
+        $createCommand->execute([ 'name' => $name ]);
 
-        $this->assertRegExp('/has been created/', $command->getDisplay());
+        $this->assertRegExp('/has been created/', $createCommand->getDisplay());
 
-        CodeIgniterHelper::setDefaults($this->appPath);
+        $this->setDefaults();
     }
 
     /**
@@ -61,17 +33,17 @@ class CreateMigrationCommandTest extends PHPUnit_Framework_TestCase
      */
     public function testCreateTableFromDatabase()
     {
-        CodeIgniterHelper::setDefaults($this->appPath);
+        $this->setDefaults();
 
         $name = 'create_user_table';
         $file = APPPATH . 'migrations/' . date('YmdHis') . '_' . $name . '.php';
 
-        $command = new CommandTester($this->command);
-        $command->execute([ 'name' => $name, '--from-database' => true ]);
+        $createCommand = new CommandTester($this->createCommand);
+        $createCommand->execute([ 'name' => $name, '--from-database' => true ]);
 
-        $this->assertRegExp('/has been created/', $command->getDisplay());
+        $this->assertRegExp('/has been created/', $createCommand->getDisplay());
 
-        CodeIgniterHelper::setDefaults($this->appPath);
+        $this->setDefaults();
     }
 
     /**
@@ -81,20 +53,20 @@ class CreateMigrationCommandTest extends PHPUnit_Framework_TestCase
      */
     public function testCreateTableWithSequentialOption()
     {
-        CodeIgniterHelper::setDefaults($this->appPath);
+        $this->setDefaults();
 
         $name = 'create_user_table';
         $file = APPPATH . 'migrations/002_' . $name . '.php';
 
-        $command = new CommandTester($this->command);
-        $command->execute([ 'name' => $name, '--sequential' => true ]);
+        $createCommand = new CommandTester($this->createCommand);
+        $createCommand->execute([ 'name' => $name, '--sequential' => true ]);
 
-        $command = new CommandTester($this->command);
-        $command->execute([ 'name' => $name, '--sequential' => true ]);
+        $createCommand = new CommandTester($this->createCommand);
+        $createCommand->execute([ 'name' => $name, '--sequential' => true ]);
 
         $this->assertFileExists($file);
 
-        CodeIgniterHelper::setDefaults($this->appPath);
+        $this->setDefaults();
     }
 
     /**
@@ -104,17 +76,17 @@ class CreateMigrationCommandTest extends PHPUnit_Framework_TestCase
      */
     public function testAddColumnInTable()
     {
-        CodeIgniterHelper::setDefaults($this->appPath);
+        $this->setDefaults();
 
         $name = 'add_name_in_user_table';
         $file = APPPATH . 'migrations/' . date('YmdHis') . '_' . $name . '.php';
 
-        $command = new CommandTester($this->command);
-        $command->execute([ 'name' => $name ]);
+        $createCommand = new CommandTester($this->createCommand);
+        $createCommand->execute([ 'name' => $name ]);
 
-        $this->assertRegExp('/has been created/', $command->getDisplay());
+        $this->assertRegExp('/has been created/', $createCommand->getDisplay());
 
-        CodeIgniterHelper::setDefaults($this->appPath);
+        $this->setDefaults();
     }
 
     /**
@@ -124,17 +96,17 @@ class CreateMigrationCommandTest extends PHPUnit_Framework_TestCase
      */
     public function testModifyColumnInTable()
     {
-        CodeIgniterHelper::setDefaults($this->appPath);
+        $this->setDefaults();
 
         $name = 'modify_name_in_user_table';
         $file = APPPATH . 'migrations/' . date('YmdHis') . '_' . $name . '.php';
 
-        $command = new CommandTester($this->command);
-        $command->execute([ 'name' => $name ]);
+        $createCommand = new CommandTester($this->createCommand);
+        $createCommand->execute([ 'name' => $name ]);
 
-        $this->assertRegExp('/has been created/', $command->getDisplay());
+        $this->assertRegExp('/has been created/', $createCommand->getDisplay());
 
-        CodeIgniterHelper::setDefaults($this->appPath);
+        $this->setDefaults();
     }
 
     /**
@@ -144,16 +116,16 @@ class CreateMigrationCommandTest extends PHPUnit_Framework_TestCase
      */
     public function testFromDatabaseError()
     {
-        CodeIgniterHelper::setDefaults($this->appPath);
+        $this->setExpectedException('InvalidArgumentException');
+
+        $this->setDefaults();
 
         $name = 'modify_name_in_user_table';
         $file = APPPATH . 'migrations/' . date('YmdHis') . '_' . $name . '.php';
 
-        $command = new CommandTester($this->command);
-        $command->execute([ 'name' => $name, '--from-database' => true ]);
+        $createCommand = new CommandTester($this->createCommand);
+        $createCommand->execute([ 'name' => $name, '--from-database' => true ]);
 
-        $this->assertRegExp('/--from-database is only/', $command->getDisplay());
-
-        CodeIgniterHelper::setDefaults($this->appPath);
+        $this->setDefaults();
     }
 }

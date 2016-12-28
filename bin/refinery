@@ -1,5 +1,2 @@
 #!/usr/bin/env php
-<?php
-
-// Load and run the Refinery application
-require 'refinery.php';
+<?php require 'refinery.php';

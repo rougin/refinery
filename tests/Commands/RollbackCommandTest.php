@@ -5,58 +5,9 @@ namespace Rougin\Refinery\Commands;
 use Symfony\Component\Console\Tester\CommandTester;
 
 use Rougin\SparkPlug\Instance;
-use Rougin\Refinery\Fixture\CommandBuilder;
-use Rougin\Refinery\Fixture\CodeIgniterHelper;
 
-use PHPUnit_Framework_TestCase;
-
-class RollbackCommandTest extends PHPUnit_Framework_TestCase
+class RollbackCommandTest extends \Rougin\Refinery\TestCase
 {
-    /**
-     * @var \Symfony\Component\Console\Command\Command
-     */
-    protected $command;
-
-    /**
-     * @var \Symfony\Component\Console\Command\Command
-     */
-    protected $createCommand;
-
-    /**
-     * @var \Symfony\Component\Console\Command\Command
-     */
-    protected $migrateCommand;
-
-    /**
-     * @var \Symfony\Component\Console\Command\Command
-     */
-    protected $resetCommand;
-
-    /**
-     * @var string
-     */
-    protected $appPath;
-
-    /**
-     * Sets up the command and the application path.
-     *
-     * @return void
-     */
-    public function setUp()
-    {
-        $this->appPath = __DIR__ . '/../TestApp/application';
-
-        $command = 'Rougin\Refinery\Commands\RollbackCommand';
-        $migrateCommand = 'Rougin\Refinery\Commands\MigrateCommand';
-        $createCommand = 'Rougin\Refinery\Commands\CreateMigrationCommand';
-        $resetCommand = 'Rougin\Refinery\Commands\ResetCommand';
-
-        $this->command = CommandBuilder::create($command);
-        $this->migrateCommand = CommandBuilder::create($migrateCommand);
-        $this->createCommand = CommandBuilder::create($createCommand);
-        $this->resetCommand = CommandBuilder::create($resetCommand);
-    }
-
     /**
      * Tests "migrate" command.
      *
@@ -64,9 +15,9 @@ class RollbackCommandTest extends PHPUnit_Framework_TestCase
      */
     public function testRollbackCommand()
     {
-        $ci = Instance::create($this->appPath);
+        $ci = Instance::create($this->path);
 
-        CodeIgniterHelper::setDefaults($this->appPath);
+        $this->setDefaults();
 
         $ci->load->dbforge();
         $ci->dbforge->drop_table('country', true);
@@ -81,13 +32,13 @@ class RollbackCommandTest extends PHPUnit_Framework_TestCase
         $migrateCommand->execute([]);
 
         // Rollback
-        $command = new CommandTester($this->command);
-        $command->execute([]);
+        $rollbackCommand = new CommandTester($this->rollbackCommand);
+        $rollbackCommand->execute([]);
 
         $pattern = '/Database is reverted back to version/';
-        $this->assertRegExp($pattern, $command->getDisplay());
+        $this->assertRegExp($pattern, $rollbackCommand->getDisplay());
 
-        CodeIgniterHelper::setDefaults($this->appPath);
+        $this->setDefaults();
     }
 
     /**
@@ -97,9 +48,9 @@ class RollbackCommandTest extends PHPUnit_Framework_TestCase
      */
     public function testRollbackCommandWithVersion()
     {
-        $ci = Instance::create($this->appPath);
+        $ci = Instance::create($this->path);
 
-        CodeIgniterHelper::setDefaults($this->appPath);
+        $this->setDefaults();
 
         $ci->load->dbforge();
         $ci->dbforge->drop_table('country', true);
@@ -113,20 +64,20 @@ class RollbackCommandTest extends PHPUnit_Framework_TestCase
         $migrateCommand = new CommandTester($this->migrateCommand);
         $migrateCommand->execute([]);
 
-        $command = new CommandTester($this->command);
-        $command->execute(['version' => '999']);
+        $rollbackCommand = new CommandTester($this->rollbackCommand);
+        $rollbackCommand->execute(['version' => '999']);
 
         $pattern = '/Cannot rollback to version/';
-        $this->assertRegExp($pattern, $command->getDisplay());
+        $this->assertRegExp($pattern, $rollbackCommand->getDisplay());
 
         // Migrate
         $migrateCommand = new CommandTester($this->migrateCommand);
         $migrateCommand->execute([]);
 
-        $command = new CommandTester($this->command);
-        $command->execute(['version' => '001']);
+        $rollbackCommand = new CommandTester($this->rollbackCommand);
+        $rollbackCommand->execute(['version' => '001']);
 
-        CodeIgniterHelper::setDefaults($this->appPath);
+        $this->setDefaults();
     }
 
     /**
@@ -136,21 +87,21 @@ class RollbackCommandTest extends PHPUnit_Framework_TestCase
      */
     public function testRollbackCommandWithoutMigrations()
     {
-        $ci = Instance::create($this->appPath);
+        $ci = Instance::create($this->path);
 
-        CodeIgniterHelper::setDefaults($this->appPath);
+        $this->setDefaults();
 
         $ci->load->dbforge();
         $ci->dbforge->drop_table('country', true);
         $ci->dbforge->drop_table('region', true);
 
         // Rollback
-        $command = new CommandTester($this->command);
-        $command->execute([]);
+        $rollbackCommand = new CommandTester($this->rollbackCommand);
+        $rollbackCommand->execute([]);
 
         $pattern = '/There\'s nothing to be rollbacked at/';
-        $this->assertRegExp($pattern, $command->getDisplay());
+        $this->assertRegExp($pattern, $rollbackCommand->getDisplay());
 
-        CodeIgniterHelper::setDefaults($this->appPath);
+        $this->setDefaults();
     }
 }
