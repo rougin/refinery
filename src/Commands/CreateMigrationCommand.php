@@ -18,6 +18,16 @@ use Symfony\Component\Console\Output\OutputInterface;
 class CreateMigrationCommand extends AbstractCommand
 {
     /**
+     * Checks whether the command is enabled or not in the current environment.
+     *
+     * @return boolean
+     */
+    public function isEnabled()
+    {
+        return true;
+    }
+
+    /**
      * Sets the configurations of the specified command.
      *
      * @return void
@@ -149,7 +159,7 @@ class CreateMigrationCommand extends AbstractCommand
         $data['columns']  = [];
         $data['defaults'] = [];
 
-        if ($input->getOption('from-database') === true) {
+        if ($input->getOption('from-database')) {
             if ($data['command_name'] != 'create') {
                 $message = '--from-database is only available to create_*table*_table keyword';
 
