@@ -48,21 +48,37 @@ class MigrateCommand extends AbstractCommand
 
         $this->toggleMigration();
 
-        // Show messages of migrated files
-        if ($current != $latest) {
-            $count = count($migrations);
+        $messages = $this->getMessages($migrations, $filenames, $current, $latest);
 
-            for ($counter = 0; $counter < $count; $counter++) {
-                if ($current >= $migrations[$counter]) {
-                    continue;
-                }
+        foreach ($messages as $message) {
+            $output->writeln('<info>' . $message . '</info>');
+        }
+    }
 
+    /**
+     * Generates messages for successful migrations.
+     *
+     * @param  array  $migrations
+     * @param  string $current
+     * @param  string $latest
+     * @return boolean
+     */
+    protected function getMessages(array $migrations, array $filenames, $current, $latest)
+    {
+        $messages = [];
+
+        ($current != $latest) || array_push($messages, 'Database is up to date.');
+
+        $count = count($migrations);
+
+        for ($counter = 0; $counter < $count; $counter++) {
+            if ($current <= $migrations[$counter]) {
                 $message = $filenames[$counter] . ' has been migrated to the database.';
 
-                $output->writeln('<info>' . $message . '</info>');
+                array_push($messages, $message);
             }
-        } else {
-            $output->writeln('<info>Database is up to date.</info>');
         }
+
+        return $messages;
     }
 }

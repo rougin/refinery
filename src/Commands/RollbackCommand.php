@@ -40,33 +40,19 @@ class RollbackCommand extends AbstractCommand
         list($filenames, $migrations) = $this->getMigrations(APPPATH . 'migrations');
 
         $current = $this->getLatestVersion();
-        $end     = count($migrations) - 1;
 
         if (intval($current) <= 0) {
-            return $output->writeln('<error>There\'s nothing to be rollbacked at.</error>');
+            return $output->writeln('<info>There\'s nothing to be rollbacked at.</info>');
         }
 
         $version = $input->getArgument('version');
-        $found   = false;
 
-        foreach ($migrations as $migration) {
-            if ($migration == $version || empty($version)) {
-                $found = true;
+        $this->isValidVersion($migrations, $version);
 
-                break;
-            }
-        }
+        $migration = $migrations[count($migrations) - 1];
+        $fileName  = $filenames[count($migrations) - 1];
 
-        if (! $found) {
-            return $output->writeln('<error>Cannot rollback to version ' . $version . '.</error>');
-        }
-
-        $migration = $migrations[$end];
-        $fileName  = $filenames[$end];
-
-        if ($version) {
-            $migration = $version;
-        }
+        empty($version) || $migration = $version;
 
         // Enable migration and change the current version to a latest one
         $this->toggleMigration(true);
@@ -80,5 +66,23 @@ class RollbackCommand extends AbstractCommand
         $message = "Database is reverted back to version $migration ($fileName)";
 
         return $output->writeln('<info>' . $message . '</info>');
+    }
+
+    /**
+     * Checks if the version is valid to be rolled back.
+     *
+     * @param  array   $migrations
+     * @param  string  $version
+     * @return boolean
+     */
+    protected function isValidVersion(array $migrations, $version)
+    {
+        foreach ($migrations as $migration) {
+            if ($migration == $version || empty($version)) {
+                return true;
+            }
+        }
+
+        throw new \InvalidArgumentException('Cannot rollback to version ' . $version);
     }
 }

@@ -48,6 +48,8 @@ class RollbackCommandTest extends \Rougin\Refinery\TestCase
      */
     public function testRollbackCommandWithVersion()
     {
+        $this->setExpectedException('InvalidArgumentException');
+
         $ci = Instance::create($this->path);
 
         $this->setDefaults();
@@ -66,9 +68,6 @@ class RollbackCommandTest extends \Rougin\Refinery\TestCase
 
         $rollbackCommand = new CommandTester($this->rollbackCommand);
         $rollbackCommand->execute(['version' => '999']);
-
-        $pattern = '/Cannot rollback to version/';
-        $this->assertRegExp($pattern, $rollbackCommand->getDisplay());
 
         // Migrate
         $migrateCommand = new CommandTester($this->migrateCommand);

@@ -93,18 +93,18 @@ abstract class AbstractCommand extends \Symfony\Component\Console\Command\Comman
         $filenames  = [];
         $migrations = [];
 
+        $config = $this->filesystem->read('application/config/migration.php');
+        $limits = [ 'sequential' => 3, 'timestamp' => 14 ];
+
+        preg_match('/\$config\[\'migration_type\'\] = \'(.*?)\';/i', $config, $match);
+
         // Searches a listing of migration files and sorts them after
         $directory = new \RecursiveDirectoryIterator($path, \FilesystemIterator::SKIP_DOTS);
         $iterator  = new \RecursiveIteratorIterator($directory, \RecursiveIteratorIterator::SELF_FIRST);
 
         foreach ($iterator as $path) {
             array_push($filenames, str_replace('.php', '', $path->getFilename()));
-
-            $migration = substr($path->getFilename(), 0, 14);
-
-            is_numeric($migration) || $migration = substr($path->getFilename(), 0, 3);
-
-            array_push($migrations, $migration);
+            array_push($migrations, substr($path->getFilename(), 0, $limits[$match[1]]));
         }
 
         sort($filenames);
