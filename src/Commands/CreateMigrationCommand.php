@@ -149,12 +149,6 @@ class CreateMigrationCommand extends AbstractCommand
      */
     protected function prepareData(InputInterface $input, array $keywords)
     {
-        if ($input->getOption('from-database') && $keywords[0] != 'create') {
-            $message = '--from-database is only available to create_*table*_table keyword';
-
-            throw new \InvalidArgumentException($message);
-        }
-
         $data = [];
 
         $data['command_name'] = $keywords[0];
@@ -165,9 +159,17 @@ class CreateMigrationCommand extends AbstractCommand
         $data['columns']  = [];
         $data['defaults'] = [];
 
-        if ($data['command_name'] == 'create' && $input->getOption('from-database') === true) {
-            $data['columns']  = $this->describe->getTable($data['table_name']);
-            $data['defaults'] = [];
+        if ($input->getOption('from-database') === true) {
+            if ($data['command_name'] == 'create') {
+                $data['columns']  = $this->describe->getTable($data['table_name']);
+                $data['defaults'] = [];
+
+                return $data;
+            }
+
+            $message = '--from-database is only available to create_*table*_table keyword';
+
+            throw new \InvalidArgumentException($message);
         }
 
         return $data;
