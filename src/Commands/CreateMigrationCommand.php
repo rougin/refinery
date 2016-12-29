@@ -64,23 +64,15 @@ class CreateMigrationCommand extends AbstractCommand
 
         file_exists($path) || mkdir($path);
 
-        $fileName = date('YmdHis') . '_' . $name;
+        $fileName     = date('YmdHis') . '_' . $name;
+        $isSequential = $input->getOption('sequential');
 
         // Returns the migration type to be used
         preg_match('/\$config\[\'migration_type\'\] = \'(.*?)\';/i', $config, $match);
 
-        if ($match[1] == 'sequential' || $input->getOption('sequential')) {
-            $number = 1;
-
-            $files = new \FilesystemIterator($path, \FilesystemIterator::SKIP_DOTS);
-
-            iterator_count($files) <= 0 || $number += iterator_count($files);
-
-            $sequence = sprintf('%03d', $number);
-            $fileName = $sequence . '_' . $name;
-        }
-
-        $keywords = explode('_', $name);
+        $fileName = $this->setSequential($match[1], $isSequential, $fileName);
+        $keywords = [ '', '', '', '' ];
+        $keywords = array_replace($keywords, explode('_', $name));
 
         $data = $this->prepareData($input, $keywords);
         $data = $this->defineColumns($input, $keywords, $data);
@@ -105,17 +97,13 @@ class CreateMigrationCommand extends AbstractCommand
         $data['columns']  = [];
         $data['defaults'] = [];
 
-        if ($data['command_name'] == 'create') {
-            if ($input->getOption('from-database') === true) {
-                $data['columns'] = $this->describe->getTable($data['table_name']);
-            }
+        if ($data['command_name'] == 'create' && $input->getOption('from-database') === true) {
+            $data['columns'] = $this->describe->getTable($data['table_name']);
+        } elseif ($data['command_name'] != 'create') {
+            $data['table_name'] = $keywords[3];
 
-            return $data;
+            array_push($data['columns'], $this->setColumn($input, $keywords[1]));
         }
-
-        $data['table_name'] = (isset($keywords[3])) ? $keywords[3] : '';
-
-        array_push($data['columns'], $this->setColumn($input, $keywords[1]));
 
         if ($data['command_name'] == 'modify') {
             foreach ($this->describe->getTable($data['table_name']) as $column) {
@@ -146,7 +134,7 @@ class CreateMigrationCommand extends AbstractCommand
         $data['command_name'] = $keywords[0];
         $data['data_types']   = [ 'string' => 'VARCHAR', 'integer' => 'INT' ];
         $data['class_name']   = underscore($input->getArgument('name'));
-        $data['table_name']   = (isset($keywords[1])) ? $keywords[1] : '';
+        $data['table_name']   = $keywords[1];
 
         return $data;
     }
@@ -172,5 +160,31 @@ class CreateMigrationCommand extends AbstractCommand
         $column->setAutoIncrement($input->getOption('auto_increment'));
 
         return $column;
+    }
+
+    /**
+     * Changes the file name to sequential mode.
+     *
+     * @param  string  $migrationType
+     * @param  boolean $isSequential
+     * @param  string  $fileName
+     * @return string
+     */
+    protected function setSequential($migrationType, $isSequential = false, $fileName)
+    {
+        $path = APPPATH . 'migrations';
+
+        if ($migrationType == 'sequential' || $isSequential) {
+            $number = 1;
+
+            $files = new \FilesystemIterator($path, \FilesystemIterator::SKIP_DOTS);
+
+            $number += iterator_count($files);
+
+            $sequence = sprintf('%03d', $number);
+            $fileName = $sequence . '_' . substr($fileName, 15);
+        }
+
+        return $fileName;
     }
 }
