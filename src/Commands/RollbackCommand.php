@@ -44,19 +44,10 @@ class RollbackCommand extends AbstractCommand
 
         $this->isValidVersion($migrations, $version);
 
-        $migration = $migrations[count($migrations) - 1];
+        $migration = $version ?: $migrations[count($migrations) - 1];
         $fileName  = $filenames[count($migrations) - 1];
 
-        empty($version) || $migration = $version;
-
-        // Enable migration and change the current version to a latest one
-        $this->toggleMigration(true);
-        $this->changeVersion($current, $migration);
-
-        $this->codeigniter->load->library('migration');
-        $this->codeigniter->migration->current();
-
-        $this->toggleMigration();
+        $this->migrate($current, $migration);
 
         $message = "Database is reverted back to version $migration ($fileName)";
 

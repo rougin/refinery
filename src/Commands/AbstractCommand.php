@@ -98,10 +98,8 @@ abstract class AbstractCommand extends \Symfony\Component\Console\Command\Comman
         $filenames  = [];
         $migrations = [];
 
-        $config = $this->filesystem->read('application/config/migration.php');
         $limits = [ 'sequential' => 3, 'timestamp' => 14 ];
-
-        preg_match('/\$config\[\'migration_type\'\] = \'(.*?)\';/i', $config, $match);
+        $type   = $this->getMigrationType();
 
         // Searches a listing of migration files and sorts them after
         $directory = new \RecursiveDirectoryIterator($path, \FilesystemIterator::SKIP_DOTS);
@@ -109,13 +107,27 @@ abstract class AbstractCommand extends \Symfony\Component\Console\Command\Comman
 
         foreach ($iterator as $path) {
             array_push($filenames, str_replace('.php', '', $path->getFilename()));
-            array_push($migrations, substr($path->getFilename(), 0, $limits[$match[1]]));
+            array_push($migrations, substr($path->getFilename(), 0, $limits[$type]));
         }
 
         sort($filenames);
         sort($migrations);
 
         return [ $filenames, $migrations ];
+    }
+
+    /**
+     * Returns the current migration type.
+     *
+     * @return string
+     */
+    public function getMigrationType()
+    {
+        $config = $this->filesystem->read('application/config/migration.php');
+
+        preg_match('/\$config\[\'migration_type\'\] = \'(.*?)\';/i', $config, $match);
+
+        return $match[1] ?: 'timestamp';
     }
 
     /**
@@ -128,6 +140,25 @@ abstract class AbstractCommand extends \Symfony\Component\Console\Command\Comman
         $migrations = glob(APPPATH . 'migrations/*.php');
 
         return count($migrations) > 0;
+    }
+
+    /**
+     * Migrates the specified versions to database.
+     *
+     * @param  string $old
+     * @param  string $new
+     * @return void
+     */
+    public function migrate($old, $new)
+    {
+        // Enable migration and change the current version to a latest one
+        $this->toggleMigration(true);
+        $this->changeVersion($old, $new);
+
+        $this->codeigniter->load->library('migration');
+        $this->codeigniter->migration->current();
+
+        $this->toggleMigration();
     }
 
     /**
