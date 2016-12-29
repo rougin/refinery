@@ -70,14 +70,19 @@ abstract class AbstractCommand extends \Symfony\Component\Console\Command\Comman
     /**
      * Gets the latest migration version
      *
+     * @param  boolean $rollback
      * @return string
      */
-    public function getLatestVersion()
+    public function getLatestVersion($rollback = false)
     {
         $config  = $this->filesystem->read('application/config/migration.php');
         $pattern = '/\$config\[\'migration_version\'\] = (\d+);/';
 
         preg_match_all($pattern, $config, $match);
+
+        if ($rollback && intval($match[1][0]) <= 0) {
+            throw new \UnexpectedValueException("There's nothing to be rollbacked at.");
+        }
 
         return $match[1][0];
     }

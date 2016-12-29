@@ -62,22 +62,15 @@ class CreateMigrationCommand extends AbstractCommand
         $name = underscore($input->getArgument('name'));
         $path = APPPATH . 'migrations';
 
-        $fileName = date('YmdHis') . '_' . $name;
+        file_exists($path) || mkdir($path);
+
+        $fileName     = date('YmdHis') . '_' . $name;
+        $isSequential = $input->getOption('sequential');
 
         // Returns the migration type to be used
         preg_match('/\$config\[\'migration_type\'\] = \'(.*?)\';/i', $config, $match);
 
-        if ($match[1] == 'sequential' || $input->getOption('sequential')) {
-            $number = 1;
-
-            $files = new \FilesystemIterator($path, \FilesystemIterator::SKIP_DOTS);
-
-            $number += iterator_count($files);
-
-            $sequence = sprintf('%03d', $number);
-            $fileName = $sequence . '_' . $name;
-        }
-
+        $fileName = $this->setSequential($match[1], $isSequential, $fileName);
         $keywords = [ '', '', '', '' ];
         $keywords = array_replace($keywords, explode('_', $name));
 
@@ -167,5 +160,31 @@ class CreateMigrationCommand extends AbstractCommand
         $column->setAutoIncrement($input->getOption('auto_increment'));
 
         return $column;
+    }
+
+    /**
+     * Changes the file name to sequential mode.
+     *
+     * @param  string  $migrationType
+     * @param  boolean $isSequential
+     * @param  string  $fileName
+     * @return string
+     */
+    protected function setSequential($migrationType, $isSequential = false, $fileName)
+    {
+        $path = APPPATH . 'migrations';
+
+        if ($migrationType == 'sequential' || $isSequential) {
+            $number = 1;
+
+            $files = new \FilesystemIterator($path, \FilesystemIterator::SKIP_DOTS);
+
+            $number += iterator_count($files);
+
+            $sequence = sprintf('%03d', $number);
+            $fileName = $sequence . '_' . substr($fileName, 15);
+        }
+
+        return $fileName;
     }
 }

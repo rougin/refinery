@@ -4,6 +4,9 @@ All notable changes to `Refinery` will be documented in this file.
 
 ## [0.3.0](https://github.com/rougin/describe/compare/v0.2.1...v0.3.0) - Unreleased
 
+### Added
+- Exceptions for specific errors
+
 ### Changed
 - Improve code quality
 

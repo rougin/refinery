@@ -39,12 +39,7 @@ class RollbackCommand extends AbstractCommand
     {
         list($filenames, $migrations) = $this->getMigrations(APPPATH . 'migrations');
 
-        $current = $this->getLatestVersion();
-
-        if (intval($current) <= 0) {
-            return $output->writeln('<info>There\'s nothing to be rollbacked at.</info>');
-        }
-
+        $current = $this->getLatestVersion(true);
         $version = $input->getArgument('version');
 
         $this->isValidVersion($migrations, $version);

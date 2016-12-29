@@ -86,6 +86,8 @@ class RollbackCommandTest extends \Rougin\Refinery\TestCase
      */
     public function testRollbackCommandWithoutMigrations()
     {
+        $this->setExpectedException('UnexpectedValueException');
+
         $ci = Instance::create($this->path);
 
         $this->setDefaults();
@@ -97,9 +99,6 @@ class RollbackCommandTest extends \Rougin\Refinery\TestCase
         // Rollback
         $rollbackCommand = new CommandTester($this->rollbackCommand);
         $rollbackCommand->execute([]);
-
-        $pattern = '/There\'s nothing to be rollbacked at/';
-        $this->assertRegExp($pattern, $rollbackCommand->getDisplay());
 
         $this->setDefaults();
     }
