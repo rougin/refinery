@@ -134,9 +134,7 @@ class CreateMigrationCommand extends AbstractCommand
     {
         $path = APPPATH . 'migrations';
 
-        if (! file_exists($path)) {
-            mkdir($path);
-        }
+        file_exists($path) || mkdir($path);
 
         $keywords = [ '', '', '', '' ];
         $keywords = array_replace($keywords, explode('_', underscore($name)));
