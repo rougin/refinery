@@ -58,15 +58,9 @@ class CreateMigrationCommand extends AbstractCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $fileName = $this->getFileName($input->getArgument('name'), $input->getOption('sequential'));
-        $keywords = $this->getKeywords($input->getArgument('name'));
+        $keywords = $this->getKeywords($input->getArgument('name'), $input->getOption('from-database'));
 
         $data = $this->prepareData($input, $keywords);
-
-        if ($input->getOption('from-database') && $data['command_name'] != 'create') {
-            $message = '--from-database is only available to create_*table*_table keyword';
-
-            throw new \InvalidArgumentException($message);
-        }
 
         if ($data['command_name'] != 'create') {
             $data = $this->defineColumns($input, $keywords, $data);
@@ -132,18 +126,28 @@ class CreateMigrationCommand extends AbstractCommand
     /**
      * Gets the defined keywords from the command.
      *
-     * @param  string $name
+     * @param  string  $name
+     * @param  boolean $fromDatabase
      * @return array
      */
-    protected function getKeywords($name)
+    protected function getKeywords($name, $fromDatabase = false)
     {
         $path = APPPATH . 'migrations';
 
-        file_exists($path) || mkdir($path);
+        if (! file_exists($path)) {
+            mkdir($path);
+        }
 
         $keywords = [ '', '', '', '' ];
+        $keywords = array_replace($keywords, explode('_', underscore($name)));
 
-        return array_replace($keywords, explode('_', underscore($name)));
+        if ($fromDatabase && $keywords[0] != 'create') {
+            $message = '--from-database is only available to create_*table*_table keyword';
+
+            throw new \InvalidArgumentException($message);
+        }
+
+        return $keywords;
     }
 
     /**
