@@ -39,14 +39,7 @@ class MigrateCommand extends AbstractCommand
         $current = $this->getLatestVersion();
         $latest  = $migrations[count($migrations) - 1];
 
-        // Enable migration and change the current version to a latest one
-        $this->toggleMigration(true);
-        $this->changeVersion($current, $latest);
-
-        $this->codeigniter->load->library('migration');
-        $this->codeigniter->migration->current();
-
-        $this->toggleMigration();
+        $this->migrate($current, $latest);
 
         $messages = $this->getMessages($migrations, $filenames, $current, $latest);
 

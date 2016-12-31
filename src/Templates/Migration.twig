@@ -20,7 +20,7 @@ class Migration_{{ class_name }} extends CI_Migration {
 			)
 		));
 
-{% if column.isPrimary %}
+{% if column.isPrimaryKey %}
 		$this->dbforge->add_key('{{ column.field }}', TRUE);
 
 {% endif %}
@@ -48,7 +48,7 @@ class Migration_{{ class_name }} extends CI_Migration {
 			)
 		));
 
-{% if column.isPrimary %}
+{% if column.isPrimaryKey %}
 		$this->dbforge->add_key('{{ column.field }}', TRUE);
 {% endif %}
 {% endfor %}
@@ -64,7 +64,7 @@ class Migration_{{ class_name }} extends CI_Migration {
 			)
 		));
 
-{% if column.isPrimary %}
+{% if column.isPrimaryKey %}
 		$this->dbforge->add_key('{{ column.field }}', TRUE);
 
 {% endif %}
