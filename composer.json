@@ -2,8 +2,9 @@
     "name": "rougin/refinery",
     "description": "'Ready-to-eat' migrations for Codeigniter",
     "keywords": [
-        "refinery",
+        "codeigniter",
         "database",
+        "refinery",
         "migrations",
         "php"
     ],
@@ -20,13 +21,13 @@
     "require": {
         "php": ">=5.4.0",
         "rougin/blueprint": "~0.5",
-        "rougin/describe": "dev-master",
+        "rougin/describe": "~1.6",
         "rougin/spark-plug": "~0.5"
     },
     "require-dev": {
         "phpunit/phpunit" : "4.*",
-        "scrutinizer/ocular": "~1.1",
-        "rougin/codeigniter": "~3.0"
+        "rougin/codeigniter": "~3.0",
+        "scrutinizer/ocular": "~1.1"
     },
     "bin": [
         "bin/refinery",
@@ -34,7 +35,7 @@
     ],
     "autoload": {
         "psr-4": {
-            "Rougin\\Refinery\\": "src/"
+            "Rougin\\Refinery\\": "src"
         }
     },
     "autoload-dev": {
