@@ -7,6 +7,9 @@ All notable changes to `Refinery` will be documented in this file.
 ### Added
 - Exceptions for specific errors
 
+### Fixed
+- Guessing the keywords from user's input
+
 ### Changed
 - Improve code quality
 

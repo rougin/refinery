@@ -2,4 +2,4 @@
 
 require 'vendor/autoload.php';
 
-Rougin\Refinery\Refinery::boot('refinery.yml', null)->run();
+Rougin\Refinery\Refinery::boot()->run();
