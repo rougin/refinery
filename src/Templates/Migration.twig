@@ -8,7 +8,7 @@ class Migration_{{ class_name }} extends CI_Migration {
 {% for column in columns if command_name == 'delete' %}
 		$this->dbforge->drop_column('{{ table_name }}', '{{ column.field }}');
 {% endfor %}
-{% for column in columns if command_name == 'add' or command_name == 'create' %}
+{% for column in columns if command_name == 'add' or command_name == 'create' or command_name == 'modify' %}
 		$this->dbforge->{{ command_name }}_column('{{ table_name }}', array(
 			'{{ column.field }}' => array(
 				'type' => '{{ data_types[column.dataType] }}',

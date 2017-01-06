@@ -67,6 +67,7 @@ class CreateMigrationCommand extends AbstractCommand
         }
 
         $rendered = $this->renderer->render('Migration.twig', $data);
+        $rendered = str_replace("));\n\n\t}", "));\n\t}", $rendered);
 
         $this->filesystem->write('application/migrations/' . $fileName . '.php', $rendered);
 
@@ -83,13 +84,13 @@ class CreateMigrationCommand extends AbstractCommand
      */
     protected function defineColumns(InputInterface $input, array $keywords, array $data)
     {
-        $data['table_name'] = $keywords[3];
+        $data['table_name'] = $keywords[1];
 
-        array_push($data['columns'], $this->setColumn($input, $keywords[1]));
+        array_push($data['columns'], $this->setColumn($input, $keywords[2]));
 
-        if ($data['command_name'] == 'modify') {
+        if ($data['command_name'] == 'modify' || $data['command_name'] == 'update') {
             foreach ($this->describe->getTable($data['table_name']) as $column) {
-                $column->getField() != $keywords[1] || array_push($data['defaults'], $column);
+                $column->getField() != $keywords[2] || array_push($data['defaults'], $column);
             }
         }
 
@@ -132,12 +133,25 @@ class CreateMigrationCommand extends AbstractCommand
      */
     protected function getKeywords($name, $fromDatabase = false)
     {
-        $path = APPPATH . 'migrations';
+        $empty = [ '', '', '' ];
+        $path  = APPPATH . 'migrations';
 
         file_exists($path) || mkdir($path);
 
-        $keywords = [ '', '', '', '' ];
-        $keywords = array_replace($keywords, explode('_', underscore($name)));
+        preg_match('/(.*?)_(.*?)_table/', underscore($name), $keywords);
+
+        if (strpos($keywords[2], '_in') !== false) {
+            preg_match('/(.*?)_(.*?)_in_(.*?)_table/', underscore($name), $keywords);
+
+            $temp = $keywords[3];
+
+            $keywords[3] = $keywords[2];
+            $keywords[2] = $temp;
+        }
+
+        array_shift($keywords);
+
+        $keywords = array_replace($empty, $keywords);
 
         if ($fromDatabase && $keywords[0] != 'create') {
             $message = '--from-database is only available to create_*table*_table keyword';

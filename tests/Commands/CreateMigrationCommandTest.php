@@ -15,7 +15,7 @@ class CreateMigrationCommandTest extends \Rougin\Refinery\TestCase
     {
         $this->setDefaults();
 
-        $name = 'create_user_table';
+        $name = 'create_role_user_table';
         $file = APPPATH . 'migrations/' . date('YmdHis') . '_' . $name . '.php';
 
         $createCommand = new CommandTester($this->createCommand);
@@ -78,7 +78,7 @@ class CreateMigrationCommandTest extends \Rougin\Refinery\TestCase
     {
         $this->setDefaults();
 
-        $name = 'add_name_in_user_table';
+        $name = 'add_created_at_in_user_table';
         $file = APPPATH . 'migrations/' . date('YmdHis') . '_' . $name . '.php';
 
         $createCommand = new CommandTester($this->createCommand);
