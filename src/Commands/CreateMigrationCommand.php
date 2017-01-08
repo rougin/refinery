@@ -58,7 +58,13 @@ class CreateMigrationCommand extends AbstractCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $fileName = $this->getFileName($input->getArgument('name'), $input->getOption('sequential'));
-        $keywords = $this->getKeywords($input->getArgument('name'), $input->getOption('from-database'));
+        $keywords = $this->getKeywords($input->getArgument('name'));
+
+        if ($input->getOption('from-database') && $keywords[0] != 'create') {
+            $message = '--from-database is only available to create_*table*_table keyword';
+
+            throw new \InvalidArgumentException($message);
+        }
 
         $data = $this->prepareData($input, $keywords);
 
@@ -88,7 +94,7 @@ class CreateMigrationCommand extends AbstractCommand
 
         array_push($data['columns'], $this->setColumn($input, $keywords[2]));
 
-        if ($data['command_name'] == 'modify' || $data['command_name'] == 'update') {
+        if ($data['command_name'] == 'modify') {
             foreach ($this->describe->getTable($data['table_name']) as $column) {
                 $column->getField() != $keywords[2] || array_push($data['defaults'], $column);
             }
@@ -127,11 +133,10 @@ class CreateMigrationCommand extends AbstractCommand
     /**
      * Gets the defined keywords from the command.
      *
-     * @param  string  $name
-     * @param  boolean $fromDatabase
+     * @param  string $name
      * @return array
      */
-    protected function getKeywords($name, $fromDatabase = false)
+    protected function getKeywords($name)
     {
         $empty = [ '', '', '' ];
         $path  = APPPATH . 'migrations';
@@ -152,12 +157,6 @@ class CreateMigrationCommand extends AbstractCommand
         array_shift($keywords);
 
         $keywords = array_replace($empty, $keywords);
-
-        if ($fromDatabase && $keywords[0] != 'create') {
-            $message = '--from-database is only available to create_*table*_table keyword';
-
-            throw new \InvalidArgumentException($message);
-        }
 
         return $keywords;
     }
