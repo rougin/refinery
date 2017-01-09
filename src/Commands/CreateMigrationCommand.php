@@ -161,8 +161,7 @@ class CreateMigrationCommand extends AbstractCommand
      */
     protected function prepareData(InputInterface $input, array $keywords)
     {
-        $data['columns']  = [];
-        $data['defaults'] = [];
+        $data = [ 'columns' => [], 'defaults' => [] ];
 
         $data['command_name'] = $keywords[0];
         $data['data_types']   = [ 'string' => 'VARCHAR', 'integer' => 'INT' ];
