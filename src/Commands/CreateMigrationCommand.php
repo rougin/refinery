@@ -68,10 +68,6 @@ class CreateMigrationCommand extends AbstractCommand
 
         $data = $this->prepareData($input, $keywords);
 
-        if ($data['command_name'] != 'create') {
-            $data = $this->defineColumns($input, $keywords, $data);
-        }
-
         $rendered = $this->renderer->render('Migration.twig', $data);
         $rendered = str_replace("));\n\n\t}", "));\n\t}", $rendered);
 
@@ -148,17 +144,12 @@ class CreateMigrationCommand extends AbstractCommand
         if (strpos($keywords[2], '_in') !== false) {
             preg_match('/(.*?)_(.*?)_in_(.*?)_table/', underscore($name), $keywords);
 
-            $temp = $keywords[3];
-
-            $keywords[3] = $keywords[2];
-            $keywords[2] = $temp;
+            list($keywords[3], $keywords[2]) = [ $keywords[2], $keywords[3] ];
         }
 
         array_shift($keywords);
 
-        $keywords = array_replace($empty, $keywords);
-
-        return $keywords;
+        return array_replace($empty, $keywords);
     }
 
     /**
@@ -170,21 +161,18 @@ class CreateMigrationCommand extends AbstractCommand
      */
     protected function prepareData(InputInterface $input, array $keywords)
     {
-        $data = [];
+        $data = [ 'columns' => [], 'defaults' => [] ];
 
         $data['command_name'] = $keywords[0];
         $data['data_types']   = [ 'string' => 'VARCHAR', 'integer' => 'INT' ];
         $data['class_name']   = underscore($input->getArgument('name'));
         $data['table_name']   = $keywords[1];
 
-        $data['columns']  = [];
-        $data['defaults'] = [];
-
         if ($input->getOption('from-database') && $data['command_name'] == 'create') {
             $data['columns'] = $this->describe->getTable($data['table_name']);
         }
 
-        return $data;
+        return ($data['command_name'] != 'create') ? $this->defineColumns($input, $keywords, $data) : $data;
     }
 
     /**
