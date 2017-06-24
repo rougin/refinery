@@ -22,7 +22,7 @@ $ composer require rougin/refinery
 ### Creating a table
 
 ``` bash
-$ php vendor/bin/refinery create create_user_table
+$ vendor/bin/refinery create create_user_table
 "20150607123241_create_user_table.php" has been created.
 ```
 
@@ -48,7 +48,7 @@ class Migration_create_user_table extends CI_Migration {
 ### Creating a column inside a table
 
 ```bash
-$ php vendor/bin/refinery create add_name_in_user_table
+$ vendor/bin/refinery create add_name_in_user_table
 "20150607123510_add_name_in_user_table.php" has been created.
 ```
 
@@ -86,20 +86,20 @@ class Migration_add_name_in_user_table extends CI_Migration {
 ### Migrate, rollback and reset
 
 ```bash
-$ php vendor/bin/refinery migrate
+$ vendor/bin/refinery migrate
 "20150607123241_create_user_table" has been migrated to the database.
 "20150607123510_add_name_in_user_table" has been migrated to the database.
 ```
 
 ```bash
-$ php vendor/bin/refinery rollback
+$ vendor/bin/refinery rollback
 Database is reverted back to version 20150607123241. (20150607123241_create_user_table)
 ```
 
 **NOTE**: You can also specify the version you want to rollback on using the `--version` option. (e.g: `--version=20150607123241`)
 
 ```bash
-$ php vendor/bin/refinery reset
+$ vendor/bin/refinery reset
 Database has been resetted.
 ```
 
