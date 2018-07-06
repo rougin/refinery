@@ -94,11 +94,13 @@ class BuilderTest extends \PHPUnit_Framework_TestCase
 
         $this->builder->describe($describe);
 
+        $search = array("\r\n", "\n");
+
         $result = $this->builder->make('create_user_table');
 
-        $result = str_replace("\r", '', $result);
+        $result = str_replace($search, PHP_EOL, $result);
 
-        $expected = str_replace("\r", '', $expected);
+        $expected = str_replace($search, PHP_EOL, $expected);
 
         $this->assertEquals($expected, $result);
     }
