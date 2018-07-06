@@ -1,2 +1,3 @@
 #!/usr/bin/env php
+
 <?php require 'refinery.php';

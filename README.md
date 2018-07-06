@@ -1,17 +1,17 @@
 # Refinery
 
 [![Latest Version on Packagist][ico-version]][link-packagist]
-[![Software License][ico-license]](LICENSE.md)
+[![Software License][ico-license]][link-license]
 [![Build Status][ico-travis]][link-travis]
 [![Coverage Status][ico-scrutinizer]][link-scrutinizer]
 [![Quality Score][ico-code-quality]][link-code-quality]
 [![Total Downloads][ico-downloads]][link-downloads]
 
-Generates "ready-to-eat" migrations for [CodeIgniter](http://www.codeigniter.com/). An extension and a command line interface for [Migrations Class](http://www.codeigniter.com/user_guide/libraries/migration.html).
+Refinery is an extension and a command line interface of [Migrations Class](https://www.codeigniter.com/user_guide/libraries/migration.html) for the [Codeigniter](https://codeigniter.com/) framework.
 
-## Install
+## Installation
 
-Via Composer
+Install Refinery through [Composer](https://getcomposer.org/):
 
 ``` bash
 $ composer require rougin/refinery
@@ -22,55 +22,144 @@ $ composer require rougin/refinery
 ### Creating a table
 
 ``` bash
-$ vendor/bin/refinery create create_user_table
-"20150607123241_create_user_table.php" has been created.
+$ vendor/bin/refinery create create_users_table
+"20180621090905_create_users_table.php" has been created.
 ```
 
-```php
-class Migration_create_user_table extends CI_Migration {
+``` php
+// application/migrations/20180621090905_create_users_table.php
+
+defined('BASEPATH') OR exit('No direct script access allowed');
+
+class Migration_create_users_table extends CI_Migration {
 
     public function up()
     {
         $this->dbforge->add_field('id');
-        $this->dbforge->create_table('user');
+
+        $this->dbforge->create_table('users');
     }
 
     public function down()
     {
-        $this->dbforge->drop_table('user');
+        $this->dbforge->drop_table('users');
     }
 
 }
 ```
 
-**NOTE**: Use `--from-database` option if you want to create a migration of a table from a database.
+Use `--from-database` option to create a migration from an existing database table.
+
+``` sql
+CREATE TABLE IF NOT EXISTS `user` (
+    `id` int(10) NOT NULL AUTO_INCREMENT,
+    `name` varchar(200) NOT NULL,
+    `age` int(2) NOT NULL,
+    `gender` varchar(10) NOT NULL,
+    PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1;
+```
+
+``` bash
+$ vendor/bin/refinery create create_users_table --from-database
+"20180621090905_create_users_table.php" has been created.
+```
+
+``` php
+// application/migrations/20180621090905_create_users_table.php
+
+defined('BASEPATH') OR exit('No direct script access allowed');
+
+class Migration_create_users_table extends CI_Migration {
+
+    public function up()
+    {
+        $this->dbforge->add_column('users', array(
+            'gender' => array(
+                'type' => 'string',
+                'constraint' => 10,
+                'auto_increment' => FALSE,
+                'default' => '',
+                'null' => FALSE,
+                'unsigned' => FALSE
+            ),
+        ));
+
+        $this->dbforge->add_column('users', array(
+            'age' => array(
+                'type' => 'integer',
+                'constraint' => 2,
+                'auto_increment' => FALSE,
+                'default' => '',
+                'null' => FALSE,
+                'unsigned' => FALSE
+            ),
+        ));
+
+        $this->dbforge->add_column('users', array(
+            'name' => array(
+                'type' => 'string',
+                'constraint' => 200,
+                'auto_increment' => FALSE,
+                'default' => '',
+                'null' => FALSE,
+                'unsigned' => FALSE
+            ),
+        ));
+
+        $this->dbforge->add_column('users', array(
+            'id' => array(
+                'type' => 'integer',
+                'constraint' => 10,
+                'auto_increment' => TRUE,
+                'default' => '',
+                'null' => FALSE,
+                'unsigned' => FALSE
+            ),
+        ));
+
+        $this->dbforge->create_table('users');
+    }
+
+    public function down()
+    {
+        $this->dbforge->drop_table('users');
+    }
+
+}
+```
 
 ### Creating a column inside a table
 
 ```bash
-$ vendor/bin/refinery create add_name_in_user_table
-"20150607123510_add_name_in_user_table.php" has been created.
+$ vendor/bin/refinery create add_name_in_users_table
+"20180621090953_add_name_in_users_table.php" has been created.
 ```
 
-```php
-class Migration_add_name_in_user_table extends CI_Migration {
+``` php
+// application/migrations/20180621090953_add_name_in_users_table.php
+
+defined('BASEPATH') OR exit('No direct script access allowed');
+
+class Migration_add_name_in_users_table extends CI_Migration {
 
     public function up()
     {
-        $this->dbforge->add_column('user', array(
+        $this->dbforge->add_column('users', array(
             'name' => array(
                 'type' => 'VARCHAR',
-                'constraint' => '50',
+                'constraint' => 50,
                 'auto_increment' => FALSE,
+                'default' => '',
                 'null' => FALSE,
                 'unsigned' => FALSE
-            )
+            ),
         ));
     }
 
     public function down()
     {
-        $this->dbforge->drop_column('user', 'name');
+        $this->dbforge->drop_column('users', 'name');
     }
 
 }
@@ -87,35 +176,43 @@ class Migration_add_name_in_user_table extends CI_Migration {
 
 ```bash
 $ vendor/bin/refinery migrate
-"20150607123241_create_user_table" has been migrated to the database.
-"20150607123510_add_name_in_user_table" has been migrated to the database.
+Migrating: 20180621090905_create_users_table
+Migrated:  20180621090905_create_users_table
+Migrating: 20180621090953_add_name_in_users_table
+Migrated:  20180621090953_add_name_in_users_table
 ```
 
 ```bash
 $ vendor/bin/refinery rollback
-Database is reverted back to version 20150607123241. (20150607123241_create_user_table)
+Rolling back: 20180621090953_add_name_in_users_table
+Rolled back:  20180621090953_add_name_in_users_table
 ```
 
-**NOTE**: You can also specify the version you want to rollback on using the `--version` option. (e.g: `--version=20150607123241`)
+**NOTE**: You can also specify the version you want to rollback on using the `--version` option. (e.g: `--version=20180621090905`)
+
+```bash
+$ vendor/bin/refinery rollback 20180621090905
+Rolling back: 20180621090905_create_users_table
+Rolled back:  20180621090905_create_users_table
+```
 
 ```bash
 $ vendor/bin/refinery reset
-Database has been resetted.
+Rolling back: 20180621090953_add_name_in_users_table
+Rolled back:  20180621090953_add_name_in_users_table
+Rolling back: 20180621090905_create_users_table
+Rolled back:  20180621090905_create_users_table
 ```
 
-## Change Log
+## Changelog
 
-Please see [CHANGELOG](CHANGELOG.md) for more information what has changed recently.
+Please see [CHANGELOG][link-changelog] for more information what has changed recently.
 
 ## Testing
 
 ``` bash
 $ composer test
 ```
-
-## Contributing
-
-Please see [CONTRIBUTING](CONTRIBUTING.md) for details.
 
 ## Security
 
@@ -124,23 +221,25 @@ If you discover any security related issues, please email rougingutib@gmail.com 
 ## Credits
 
 - [Rougin Royce Gutib][link-author]
-- [All Contributors][link-contributors]
+- [All contributors][link-contributors]
 
 ## License
 
-The MIT License (MIT). Please see [License File](LICENSE.md) for more information.
+The MIT License (MIT). Please see [LICENSE][link-license] for more information.
 
-[ico-version]: https://img.shields.io/packagist/v/rougin/refinery.svg?style=flat-square
-[ico-license]: https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square
-[ico-travis]: https://img.shields.io/travis/rougin/refinery/master.svg?style=flat-square
-[ico-scrutinizer]: https://img.shields.io/scrutinizer/coverage/g/rougin/refinery.svg?style=flat-square
 [ico-code-quality]: https://img.shields.io/scrutinizer/g/rougin/refinery.svg?style=flat-square
 [ico-downloads]: https://img.shields.io/packagist/dt/rougin/refinery.svg?style=flat-square
+[ico-license]: https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square
+[ico-scrutinizer]: https://img.shields.io/scrutinizer/coverage/g/rougin/refinery.svg?style=flat-square
+[ico-travis]: https://img.shields.io/travis/rougin/refinery/master.svg?style=flat-square
+[ico-version]: https://img.shields.io/packagist/v/rougin/refinery.svg?style=flat-square
 
-[link-packagist]: https://packagist.org/packages/rougin/refinery
-[link-travis]: https://travis-ci.org/rougin/refinery
-[link-scrutinizer]: https://scrutinizer-ci.com/g/rougin/refinery/code-structure
-[link-code-quality]: https://scrutinizer-ci.com/g/rougin/refinery
-[link-downloads]: https://packagist.org/packages/rougin/refinery
 [link-author]: https://github.com/rougin
-[link-contributors]: ../../contributors
+[link-changelog]: https://github.com/rougin/dexterity/CHANGELOG.md
+[link-code-quality]: https://scrutinizer-ci.com/g/rougin/refinery
+[link-contributors]: https://github.com/rougin/refinery/contributors
+[link-downloads]: https://packagist.org/packages/rougin/refinery
+[link-license]: https://github.com/rougin/refinery/LICENSE.md
+[link-packagist]: https://packagist.org/packages/rougin/refinery
+[link-scrutinizer]: https://scrutinizer-ci.com/g/rougin/refinery/code-structure
+[link-travis]: https://travis-ci.org/rougin/refinery

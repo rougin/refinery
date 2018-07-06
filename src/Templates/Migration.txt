@@ -1,0 +1,16 @@
+<?php
+defined('BASEPATH') OR exit('No direct script access allowed');
+
+class Migration_$NAME extends CI_Migration {
+
+    public function up()
+    {
+        $UP
+    }
+
+    public function down()
+    {
+        $DOWN
+    }
+
+}

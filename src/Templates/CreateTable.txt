@@ -1,0 +1,3 @@
+$this->dbforge->add_field('id');
+
+        $this->dbforge->create_table('$TABLE');

@@ -1,0 +1,1 @@
+$this->dbforge->drop_column('$TABLE', '$NAME');
