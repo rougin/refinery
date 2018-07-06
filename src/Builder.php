@@ -98,13 +98,19 @@ class Builder
     }
 
     /**
-     * Returns a boolean string value.
+     * Returns a string value of the specified data type.
      *
-     * @param  boolean $value
+     * @param  boolean|string $value
      * @return string
      */
-    protected function boolean($value)
+    protected function type($value)
     {
+        if (is_string($value) === true) {
+            $value === 'string' && $value = 'varchar';
+
+            return mb_strtoupper((string) $value);
+        }
+
         return $value ? 'TRUE' : 'FALSE';
     }
 
@@ -116,11 +122,9 @@ class Builder
      */
     protected function create(Column $column, $file)
     {
-        $unsigned = $this->boolean($column->isUnsigned());
+        $increment = $this->type($column->isAutoIncrement());
 
-        $increment = $this->boolean($column->isAutoIncrement());
-
-        $null = (string) $this->boolean($column->isNull());
+        $unsigned = $this->type($column->isUnsigned());
 
         $file = str_replace('$DEFAULT', $column->getDefaultValue(), $file);
 
@@ -128,13 +132,13 @@ class Builder
 
         $file = str_replace('$LENGTH', $column->getLength(), $file);
 
+        $file = str_replace('$NULL', $this->type($column->isNull()), $file);
+
         $file = str_replace('$NAME', $column->getField(), $file);
 
-        $file = str_replace('$NULL', $null, (string) $file);
+        $file = str_replace('$TYPE', $this->type($column->getDataType()), $file);
 
-        $file = str_replace('$TYPE', $column->getDataType(), $file);
-
-        return str_replace('$UNSIGNED', $unsigned, $file);
+        return str_replace('$UNSIGNED', $unsigned, (string) $file);
     }
 
     /**

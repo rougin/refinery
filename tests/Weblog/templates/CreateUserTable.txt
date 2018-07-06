@@ -7,7 +7,7 @@ class Migration_create_user_table extends CI_Migration {
     {
         $this->dbforge->add_column('user', array(
             'gender' => array(
-                'type' => 'string',
+                'type' => 'VARCHAR',
                 'constraint' => 10,
                 'auto_increment' => FALSE,
                 'default' => '',
@@ -18,7 +18,7 @@ class Migration_create_user_table extends CI_Migration {
 
         $this->dbforge->add_column('user', array(
             'age' => array(
-                'type' => 'integer',
+                'type' => 'INTEGER',
                 'constraint' => 2,
                 'auto_increment' => FALSE,
                 'default' => '',
@@ -29,7 +29,7 @@ class Migration_create_user_table extends CI_Migration {
 
         $this->dbforge->add_column('user', array(
             'name' => array(
-                'type' => 'string',
+                'type' => 'VARCHAR',
                 'constraint' => 200,
                 'auto_increment' => FALSE,
                 'default' => '',
@@ -40,7 +40,7 @@ class Migration_create_user_table extends CI_Migration {
 
         $this->dbforge->add_column('user', array(
             'id' => array(
-                'type' => 'integer',
+                'type' => 'INTEGER',
                 'constraint' => 10,
                 'auto_increment' => TRUE,
                 'default' => '',
