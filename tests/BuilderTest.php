@@ -96,8 +96,10 @@ class BuilderTest extends \PHPUnit_Framework_TestCase
 
         $result = $this->builder->make('create_user_table');
 
-        file_put_contents('test.txt', $result);
+        $result = str_replace("\r", '', $result);
 
-        $this->assertSame($expected, $result);
+        $expected = str_replace("\r", '', $expected);
+
+        $this->assertEquals($expected, $result);
     }
 }
