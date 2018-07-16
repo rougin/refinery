@@ -11,13 +11,6 @@ php:
 services:
   - mysql
 
-matrix:
-  allow_failures:
-    - php: 7.2
-  include:
-    - php: 5.4
-      env: 'COMPOSER_FLAGS="--prefer-stable --prefer-lowest"'
-
 before_script:
   - mysql -u root -e 'CREATE DATABASE demo;'
   - mysql -u root -e 'USE demo; CREATE TABLE IF NOT EXISTS `user` ( `id` int(10) NOT NULL AUTO_INCREMENT, `name` varchar(200) NOT NULL, `age` int(2) NOT NULL, `gender` varchar(10) NOT NULL, PRIMARY KEY (`id`) ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1;'
