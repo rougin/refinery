@@ -19,9 +19,9 @@ class Builder
     protected $column;
 
     /**
-     * @var \Rougin\Describe\Describe
+     * @var \Rougin\Describe\Describe|null
      */
-    protected $describe;
+    protected $describe = null;
 
     /**
      * @var \Rougin\Refinery\Parser
