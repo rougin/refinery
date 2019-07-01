@@ -11,13 +11,13 @@ Refinery is an extension and a command line interface of [Migrations Class](http
 
 ## Installation
 
-Install Refinery through [Composer](https://getcomposer.org/):
+Install `Refinery` via [Composer](https://getcomposer.org/):
 
 ``` bash
 $ composer require rougin/refinery
 ```
 
-## Usage
+## Basic Usage
 
 ### Creating a table
 
@@ -214,13 +214,8 @@ Please see [CHANGELOG][link-changelog] for more information what has changed rec
 $ composer test
 ```
 
-## Security
-
-If you discover any security related issues, please email rougingutib@gmail.com instead of using the issue tracker.
-
 ## Credits
 
-- [Rougin Royce Gutib][link-author]
 - [All contributors][link-contributors]
 
 ## License
@@ -234,12 +229,11 @@ The MIT License (MIT). Please see [LICENSE][link-license] for more information.
 [ico-travis]: https://img.shields.io/travis/rougin/refinery/master.svg?style=flat-square
 [ico-version]: https://img.shields.io/packagist/v/rougin/refinery.svg?style=flat-square
 
-[link-author]: https://github.com/rougin
-[link-changelog]: https://github.com/rougin/dexterity/CHANGELOG.md
+[link-changelog]: https://github.com/rougin/refinery/blob/master/CHANGELOG.md
 [link-code-quality]: https://scrutinizer-ci.com/g/rougin/refinery
 [link-contributors]: https://github.com/rougin/refinery/contributors
 [link-downloads]: https://packagist.org/packages/rougin/refinery
-[link-license]: https://github.com/rougin/refinery/LICENSE.md
+[link-license]: https://github.com/rougin/refinery/blob/master/LICENSE.md
 [link-packagist]: https://packagist.org/packages/rougin/refinery
 [link-scrutinizer]: https://scrutinizer-ci.com/g/rougin/refinery/code-structure
 [link-travis]: https://travis-ci.org/rougin/refinery
