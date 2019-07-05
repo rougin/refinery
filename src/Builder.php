@@ -9,7 +9,7 @@ use Rougin\Describe\Column;
  * Builder
  *
  * @package Refinery
- * @author  Rougin Royce Gutib <rougingutib@gmail.com>
+ * @author  Rougin Gutib <rougingutib@gmail.com>
  */
 class Builder
 {
