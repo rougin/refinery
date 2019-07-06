@@ -11,7 +11,7 @@ use Symfony\Component\Console\Application as BaseApplication;
  * Console Application
  *
  * @package Refinery
- * @author  Rougin Royce Gutib <rougingutib@gmail.com>
+ * @author  Rougin Gutib <rougingutib@gmail.com>
  */
 class Application extends BaseApplication
 {
