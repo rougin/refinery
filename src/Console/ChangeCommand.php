@@ -11,7 +11,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  * Change Command
  *
  * @package Refinery
- * @author  Rougin Royce Gutib <rougingutib@gmail.com>
+ * @author  Rougin Gutib <rougingutib@gmail.com>
  */
 class ChangeCommand extends Command
 {
