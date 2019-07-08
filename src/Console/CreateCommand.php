@@ -16,7 +16,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  * Create Command
  *
  * @package Refinery
- * @author  Rougin Royce Gutib <rougingutib@gmail.com>
+ * @author  Rougin Gutib <rougingutib@gmail.com>
  */
 class CreateCommand extends Command
 {
