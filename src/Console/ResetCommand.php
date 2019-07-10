@@ -6,7 +6,7 @@ namespace Rougin\Refinery\Console;
  * Reset Command
  *
  * @package Refinery
- * @author  Rougin Royce Gutib <rougingutib@gmail.com>
+ * @author  Rougin Gutib <rougingutib@gmail.com>
  */
 class ResetCommand extends ChangeCommand
 {
