@@ -10,7 +10,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  * Revert Command
  *
  * @package Refinery
- * @author  Rougin Royce Gutib <rougingutib@gmail.com>
+ * @author  Rougin Gutib <rougingutib@gmail.com>
  */
 class RevertCommand extends ChangeCommand
 {
