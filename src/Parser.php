@@ -6,7 +6,7 @@ namespace Rougin\Refinery;
  * Parser
  *
  * @package Refinery
- * @author  Rougin Royce Gutib <rougingutib@gmail.com>
+ * @author  Rougin Gutib <rougingutib@gmail.com>
  */
 class Parser
 {
@@ -46,7 +46,8 @@ class Parser
 
         preg_match($pattern, $matches[2], $matches);
 
-        if (isset($matches[0])) {
+        if (isset($matches[0]))
+        {
             $this->column = $matches[1];
 
             $this->table = $matches[2];
