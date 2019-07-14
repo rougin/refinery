@@ -12,7 +12,7 @@ use Symfony\Component\Console\Tester\CommandTester;
  * Abstract Test Case
  *
  * @package Refinery
- * @author  Rougin Royce Gutib <rougingutib@gmail.com>
+ * @author  Rougin Gutib <rougingutib@gmail.com>
  */
 abstract class AbstractTestCase extends \PHPUnit_Framework_TestCase
 {
