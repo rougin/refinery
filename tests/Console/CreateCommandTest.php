@@ -6,7 +6,7 @@ namespace Rougin\Refinery\Console;
  * Create Command Test
  *
  * @package Refinery
- * @author  Rougin Royce Gutib <rougingutib@gmail.com>
+ * @author  Rougin Gutib <rougingutib@gmail.com>
  */
 class CreateCommandTest extends AbstractTestCase
 {
