@@ -6,7 +6,7 @@ namespace Rougin\Refinery;
  * Parser Test
  *
  * @package Refinery
- * @author  Rougin Royce Gutib <rougingutib@gmail.com>
+ * @author  Rougin Gutib <rougingutib@gmail.com>
  */
 class ParserTest extends \PHPUnit_Framework_TestCase
 {
