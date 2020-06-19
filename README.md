@@ -7,11 +7,11 @@
 [![Quality Score][ico-code-quality]][link-code-quality]
 [![Total Downloads][ico-downloads]][link-downloads]
 
-Refinery is an extension and a command line interface of [Migrations Class](https://www.codeigniter.com/user_guide/libraries/migration.html) for the [Codeigniter](https://codeigniter.com/) framework.
+Refinery is an extension and a command line interface of [Migrations Class](https://www.codeigniter.com/user_guide/libraries/migration.html) for the [Codeigniter](https://codeigniter.com/) framework. It uses the [Describe](https://roug.in/describe/) library for retrieving the database tables and as the basis for code generation.
 
 ## Installation
 
-Install `Refinery` via [Composer](https://getcomposer.org/):
+Install `Refinery` through [Composer](https://getcomposer.org/):
 
 ``` bash
 $ composer require rougin/refinery
@@ -31,8 +31,8 @@ $ vendor/bin/refinery create create_users_table
 
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-class Migration_create_users_table extends CI_Migration {
-
+class Migration_create_users_table extends CI_Migration
+{
     public function up()
     {
         $this->dbforge->add_field('id');
@@ -44,7 +44,6 @@ class Migration_create_users_table extends CI_Migration {
     {
         $this->dbforge->drop_table('users');
     }
-
 }
 ```
 
@@ -70,8 +69,8 @@ $ vendor/bin/refinery create create_users_table --from-database
 
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-class Migration_create_users_table extends CI_Migration {
-
+class Migration_create_users_table extends CI_Migration
+{
     public function up()
     {
         $this->dbforge->add_column('users', array(
@@ -125,7 +124,6 @@ class Migration_create_users_table extends CI_Migration {
     {
         $this->dbforge->drop_table('users');
     }
-
 }
 ```
 
@@ -141,8 +139,8 @@ $ vendor/bin/refinery create add_name_in_users_table
 
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-class Migration_add_name_in_users_table extends CI_Migration {
-
+class Migration_add_name_in_users_table extends CI_Migration
+{
     public function up()
     {
         $this->dbforge->add_column('users', array(
@@ -161,16 +159,17 @@ class Migration_add_name_in_users_table extends CI_Migration {
     {
         $this->dbforge->drop_column('users', 'name');
     }
-
 }
 ```
 
 #### Available keywords
 
-* `create` - creates new table (`create_users_table`)
-* `add` - adds new column for a specific table (`add_username_in_users_table`)
-* `delete` - deletes specified column from table (`delete_created_at_in_users_table`)
-* `modify` - updates the specified column from table (`modify_name_in_users_table`)
+| Command | Description |
+| ------- | ----------- |
+| `create` | creates new table (`create_users_table`) |
+| `add` | adds new column for a specific table (`add_username_in_users_table`) |
+| `delete` | deletes specified column from table (`delete_created_at_in_users_table`) |
+| `modify` | updates the specified column from table (`modify_name_in_users_table`) |
 
 ### Migrate, rollback and reset
 
