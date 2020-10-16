@@ -22,6 +22,8 @@ class MigrateCommandTest extends AbstractTestCase
      */
     public function testExecuteMethod()
     {
+        $this->manager->reset();
+
         $this->create('create_users_table');
 
         $this->create('create_posts_table');
