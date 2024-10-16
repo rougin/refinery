@@ -28,8 +28,7 @@
   },
   "bin":
   [
-    "bin/refinery",
-    "bin/refinery.php"
+    "bin/refinery"
   ],
   "autoload":
   {
