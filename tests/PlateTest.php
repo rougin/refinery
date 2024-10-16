@@ -25,26 +25,8 @@ class PlateTest extends Testcase
     }
 
     /**
-     * @return void
-     */
-    public function test_creating_table()
-    {
-        $test = $this->findCommand('create');
-
-        $input = array('name' => 'create_users_table');
-
-        $test->execute($input);
-
-        $expected = $this->getTemplate('CreateTable');
-
-        $actual = $this->getActualFile($input['name']);
-
-        $this->assertEquals($expected, $actual);
-
-        $this->clearFiles();
-    }
-
-    /**
+     * @depends test_creating_table
+     *
      * @return void
      */
     public function test_creating_column()
@@ -69,6 +51,70 @@ class PlateTest extends Testcase
     /**
      * @return void
      */
+    public function test_creating_table()
+    {
+        $test = $this->findCommand('create');
+
+        $input = array('name' => 'create_users_table');
+
+        $test->execute($input);
+
+        $expected = $this->getTemplate('CreateTable');
+
+        $actual = $this->getActualFile($input['name']);
+
+        $this->assertEquals($expected, $actual);
+
+        $this->clearFiles();
+    }
+
+    /**
+     * @depends test_deleting_table
+     *
+     * @return void
+     */
+    public function test_deleting_column()
+    {
+        $test = $this->findCommand('create');
+
+        $input = array('name' => 'remove_name_in_users_table');
+        $input['--length'] = 100;
+        $input['--null'] = true;
+
+        $test->execute($input);
+
+        $expected = $this->getTemplate('DeleteColumn');
+
+        $actual = $this->getActualFile($input['name']);
+
+        $this->assertEquals($expected, $actual);
+
+        $this->clearFiles();
+    }
+
+    /**
+     * @return void
+     */
+    public function test_deleting_table()
+    {
+        $test = $this->findCommand('create');
+
+        $input = array('name' => 'delete_users_table');
+
+        $test->execute($input);
+
+        $expected = $this->getTemplate('DeleteTable');
+
+        $actual = $this->getActualFile($input['name']);
+
+        $this->assertEquals($expected, $actual);
+
+        $this->clearFiles();
+    }
+
+    /**
+     * @return void
+     */
     protected function clearFiles()
     {
         $path = $this->app->getAppPath();
@@ -80,6 +126,21 @@ class PlateTest extends Testcase
         {
             unlink($file);
         }
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return string
+     */
+    protected function getTemplate($name)
+    {
+        $path = __DIR__ . '/Fixture/Plates/' . $name . '.php';
+
+        /** @var string */
+        $file = file_get_contents($path);
+
+        return str_replace("\r\n", "\n", $file);
     }
 
     /**
@@ -131,18 +192,4 @@ class PlateTest extends Testcase
         return str_replace("\r\n", "\n", $result);
     }
 
-    /**
-     * @param string $name
-     *
-     * @return string
-     */
-    protected function getTemplate($name)
-    {
-        $path = __DIR__ . '/Fixture/Plates/' . $name . '.php';
-
-        /** @var string */
-        $file = file_get_contents($path);
-
-        return str_replace("\r\n", "\n", $file);
-    }
 }

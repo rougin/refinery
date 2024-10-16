@@ -31,6 +31,7 @@ class Parser
      */
     public function __construct($name)
     {
+        // Determine the table and its name prefix ---
         $allowed = implode('|', $this->getTypes());
 
         $pattern = '/(' . $allowed . ')_(.*)_table/';
@@ -40,7 +41,9 @@ class Parser
         $this->table = $matches[2];
 
         $this->type = $matches[1];
+        // -------------------------------------------
 
+        // Check if the specified pattern matches in the name ---
         $pattern = '/(.*)_in_(.*)/';
 
         preg_match($pattern, $matches[2], $matches);
@@ -51,6 +54,7 @@ class Parser
 
             $this->table = $matches[2];
         }
+        // ------------------------------------------------------
     }
 
     /**
@@ -91,6 +95,22 @@ class Parser
     public function isCreateTable()
     {
         return $this->getType() === Migration::TYPE_CREATE && $this->getColumn() === null;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isDeleteColumn()
+    {
+        return ($this->getType() === Migration::TYPE_REMOVE || $this->getType() === Migration::TYPE_DELETE) && $this->getColumn() !== null;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isDeleteTable()
+    {
+        return $this->getType() === Migration::TYPE_DELETE && $this->getColumn() === null;
     }
 
     /**

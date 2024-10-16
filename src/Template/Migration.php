@@ -99,32 +99,44 @@ class Migration extends Classidy
 
         $method->setReturn('void');
 
-        if ($this->parser->isCreateTable())
-        {
-            $table = $this->parser->getTable();
-
-            $method->setCodeLine(function ($lines) use ($table)
-            {
-                $lines[] = '$this->dbforge->drop_table(\'' . $table . '\');';
-
-                return $lines;
-            });
-        }
-
         if ($this->column && $this->parser->isCreateColumn())
         {
             $table = $this->parser->getTable();
 
             $column = $this->column;
 
-            $method->setCodeLine(function ($lines) use ($column, $table)
-            {
-                $name = $column->getField();
+            $fn = $this->getDeleteColumn($column, $table);
 
-                $lines[] = '$this->dbforge->drop_column(\'' . $table . '\', \'' . $name . '\');';
+            $method->setCodeLine($fn);
+        }
 
-                return $lines;
-            });
+        if ($this->parser->isCreateTable())
+        {
+            $table = $this->parser->getTable();
+
+            $fn = $this->getDeleteTable($table);
+
+            $method->setCodeLine($fn);
+        }
+
+        if ($this->column && $this->parser->isDeleteColumn())
+        {
+            $table = $this->parser->getTable();
+
+            $column = $this->column;
+
+            $fn = $this->getCreateColumn($column, $table);
+
+            $method->setCodeLine($fn);
+        }
+
+        if ($this->parser->isDeleteTable())
+        {
+            $table = $this->parser->getTable();
+
+            $fn = $this->getCreateTable($table);
+
+            $method->setCodeLine($fn);
         }
 
         $this->addMethod($method);
@@ -139,57 +151,131 @@ class Migration extends Classidy
 
         $method->setReturn('void');
 
-        if ($this->parser->isCreateTable())
-        {
-            $table = $this->parser->getTable();
-
-            $method->setCodeLine(function ($lines) use ($table)
-            {
-                $lines[] = '$data = array(\'id\' => array());';
-                $lines[] = '$data[\'id\'][\'type\'] = \'integer\';';
-                $lines[] = '$data[\'id\'][\'auto_increment\'] = true;';
-                $lines[] = '$data[\'id\'][\'constraint\'] = 10;';
-                $lines[] = '$this->dbforge->add_field($data);';
-                $lines[] = '$this->dbforge->add_key(\'id\', true);';
-                $lines[] = '';
-                $lines[] = '$this->dbforge->create_table(\'' . $table . '\');';
-
-                return $lines;
-            });
-        }
-
         if ($this->column && $this->parser->isCreateColumn())
         {
             $table = $this->parser->getTable();
 
-            $column = $this->column;
+            $fn = $this->getCreateColumn($this->column, $table);
 
-            $method->setCodeLine(function ($lines) use ($column, $table)
-            {
-                $default = $column->getDefaultValue();
-                $default = $default ? '"' . $default . '"' : 'null';
-                $increment = $column->isAutoIncrement() ? 'true' : 'false';
-                $length = $column->getLength();
-                $name = $column->getField();
-                $null = $column->isNull() ? 'true' : 'false';
-                $type = $column->getDataType();
-                $unsigned = $column->isUnsigned() ? 'true' : 'false';
+            $method->setCodeLine($fn);
+        }
 
-                $lines[] = '$data = array(\'' . $name . '\' => array());';
-                $lines[] = '';
-                $lines[] = '$data[\'' . $name . '\'][\'type\'] = \'' . $type . '\';';
-                $lines[] = '$data[\'' . $name . '\'][\'constraint\'] = ' . $length . ';';
-                $lines[] = '$data[\'' . $name . '\'][\'auto_increment\'] = ' . $increment . ';';
-                $lines[] = '$data[\'' . $name . '\'][\'default\'] = ' . $default . ';';
-                $lines[] = '$data[\'' . $name . '\'][\'null\'] = ' . $null . ';';
-                $lines[] = '$data[\'' . $name . '\'][\'unsigned\'] = ' . $unsigned . ';';
-                $lines[] = '';
-                $lines[] = '$this->dbforge->add_column(\'' . $table . '\', $data);';
+        if ($this->parser->isCreateTable())
+        {
+            $table = $this->parser->getTable();
 
-                return $lines;
-            });
+            $fn = $this->getCreateTable($table);
+
+            $method->setCodeLine($fn);
+        }
+
+        if ($this->column && $this->parser->isDeleteColumn())
+        {
+            $table = $this->parser->getTable();
+
+            $fn = $this->getDeleteColumn($this->column, $table);
+
+            $method->setCodeLine($fn);
+        }
+
+        if ($this->parser->isDeleteTable())
+        {
+            $table = $this->parser->getTable();
+
+            $fn = $this->getDeleteTable($table);
+
+            $method->setCodeLine($fn);
         }
 
         $this->addMethod($method);
+    }
+
+    /**
+     * @param \Rougin\Describe\Column $column
+     * @param string                  $table
+     *
+     * @return callable
+     */
+    protected function getCreateColumn(Column $column, $table)
+    {
+        return function ($lines) use ($column, $table)
+        {
+            $default = $column->getDefaultValue();
+            $default = $default ? '"' . $default . '"' : 'null';
+            $increment = $column->isAutoIncrement() ? 'true' : 'false';
+            $length = $column->getLength();
+            $name = $column->getField();
+            $null = $column->isNull() ? 'true' : 'false';
+            $type = $column->getDataType();
+            $unsigned = $column->isUnsigned() ? 'true' : 'false';
+
+            $lines[] = '$data = array(\'' . $name . '\' => array());';
+            $lines[] = '';
+            $lines[] = '$data[\'' . $name . '\'][\'type\'] = \'' . $type . '\';';
+            $lines[] = '$data[\'' . $name . '\'][\'constraint\'] = ' . $length . ';';
+            $lines[] = '$data[\'' . $name . '\'][\'auto_increment\'] = ' . $increment . ';';
+            $lines[] = '$data[\'' . $name . '\'][\'default\'] = ' . $default . ';';
+            $lines[] = '$data[\'' . $name . '\'][\'null\'] = ' . $null . ';';
+            $lines[] = '$data[\'' . $name . '\'][\'unsigned\'] = ' . $unsigned . ';';
+            $lines[] = '';
+            $lines[] = '$this->dbforge->add_column(\'' . $table . '\', $data);';
+
+            return $lines;
+        };
+    }
+
+    /**
+     * @param string $table
+     *
+     * @return callable
+     */
+    protected function getCreateTable($table)
+    {
+        return function ($lines) use ($table)
+        {
+            $lines[] = '$data = array(\'id\' => array());';
+            $lines[] = '$data[\'id\'][\'type\'] = \'integer\';';
+            $lines[] = '$data[\'id\'][\'auto_increment\'] = true;';
+            $lines[] = '$data[\'id\'][\'constraint\'] = 10;';
+            $lines[] = '$this->dbforge->add_field($data);';
+            $lines[] = '$this->dbforge->add_key(\'id\', true);';
+            $lines[] = '';
+            $lines[] = '$this->dbforge->create_table(\'' . $table . '\');';
+
+            return $lines;
+        };
+    }
+
+    /**
+     * @param string $table
+     *
+     * @return callable
+     */
+    protected function getDeleteTable($table)
+    {
+        return function ($lines) use ($table)
+        {
+            $lines[] = '$this->dbforge->drop_table(\'' . $table . '\');';
+
+            return $lines;
+        };
+    }
+
+    /**
+     * @param \Rougin\Describe\Column $column
+     * @param string                  $table
+     *
+     * @return callable
+     */
+    protected function getDeleteColumn(Column $column, $table)
+    {
+        return function ($lines) use ($column, $table)
+        {
+            $name = $column->getField();
+
+            $lines[] = '$this->dbforge->drop_column(\'' . $table . '\', \'' . $name . '\');';
+
+            return $lines;
+        };
     }
 }

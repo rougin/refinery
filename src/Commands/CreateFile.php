@@ -81,8 +81,9 @@ class CreateFile extends Command
 
         $class->setParser($parser);
 
-        if ($parser->getColumn() && $parser->isCreateColumn())
+        if ($parser->isCreateColumn() || $parser->isDeleteColumn())
         {
+            /** @var string */
             $column = $parser->getColumn();
 
             $column = $this->setColumn($column);
