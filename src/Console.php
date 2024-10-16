@@ -3,6 +3,10 @@
 namespace Rougin\Refinery;
 
 use Rougin\Blueprint\Blueprint;
+use Rougin\Blueprint\Container;
+use Rougin\Refinery\Packages\DescribePackage;
+use Rougin\Refinery\Packages\RefineryPackage;
+use Rougin\Refinery\Packages\SparkplugPackage;
 use Symfony\Component\Yaml\Yaml;
 
 /**
@@ -44,6 +48,8 @@ class Console extends Blueprint
         $this->setCommandPath(__DIR__ . '/Commands');
 
         $this->root = $root;
+
+        $this->setPackages();
     }
 
     /**
@@ -97,5 +103,26 @@ class Console extends Blueprint
 
         /** @var array<string, mixed> */
         return Yaml::parse($file);
+    }
+
+    /**
+     * @return void
+     */
+    protected function setPackages()
+    {
+        $container = new Container;
+
+        $path = $this->getAppPath();
+
+        $sparkPlug = new SparkplugPackage($path);
+        $container->addPackage($sparkPlug);
+
+        $describe = new DescribePackage;
+        $container->addPackage($describe);
+
+        $refinery = new RefineryPackage($path);
+        $container->addPackage($refinery);
+
+        $this->setContainer($container);
     }
 }
