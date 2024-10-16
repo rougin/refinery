@@ -5,6 +5,9 @@ parameters:
     - tests
   excludePaths:
     analyse:
-      - tests/Weblog/application/views
+      - tests/Weblog/views
   scanDirectories:
     - vendor/rougin/codeigniter/src
+  ignoreErrors:
+    - '#^Constant APPPATH not found\.$#'
+    - '#^Constant ENVIRONMENT not found\.$#'
