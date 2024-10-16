@@ -99,45 +99,29 @@ class Migration extends Classidy
 
         $method->setReturn('void');
 
-        if ($this->column && $this->parser->isCreateColumn())
+        $table = $this->parser->getTable();
+
+        $fn = $this->getDeleteTable($table);
+
+        if ($this->column)
         {
-            $table = $this->parser->getTable();
+            if ($this->parser->isCreateColumn())
+            {
+                $fn = $this->getDeleteColumn($this->column, $table);
+            }
 
-            $column = $this->column;
-
-            $fn = $this->getDeleteColumn($column, $table);
-
-            $method->setCodeLine($fn);
-        }
-
-        if ($this->parser->isCreateTable())
-        {
-            $table = $this->parser->getTable();
-
-            $fn = $this->getDeleteTable($table);
-
-            $method->setCodeLine($fn);
-        }
-
-        if ($this->column && $this->parser->isDeleteColumn())
-        {
-            $table = $this->parser->getTable();
-
-            $column = $this->column;
-
-            $fn = $this->getCreateColumn($column, $table);
-
-            $method->setCodeLine($fn);
+            if ($this->parser->isDeleteColumn())
+            {
+                $fn = $this->getCreateColumn($this->column, $table);
+            }
         }
 
         if ($this->parser->isDeleteTable())
         {
-            $table = $this->parser->getTable();
-
             $fn = $this->getCreateTable($table);
-
-            $method->setCodeLine($fn);
         }
+
+        $method->setCodeLine($fn);
 
         $this->addMethod($method);
     }
@@ -151,41 +135,29 @@ class Migration extends Classidy
 
         $method->setReturn('void');
 
-        if ($this->column && $this->parser->isCreateColumn())
+        $table = $this->parser->getTable();
+
+        $fn = $this->getCreateTable($table);
+
+        if ($this->column)
         {
-            $table = $this->parser->getTable();
+            if ($this->parser->isCreateColumn())
+            {
+                $fn = $this->getCreateColumn($this->column, $table);
+            }
 
-            $fn = $this->getCreateColumn($this->column, $table);
-
-            $method->setCodeLine($fn);
-        }
-
-        if ($this->parser->isCreateTable())
-        {
-            $table = $this->parser->getTable();
-
-            $fn = $this->getCreateTable($table);
-
-            $method->setCodeLine($fn);
-        }
-
-        if ($this->column && $this->parser->isDeleteColumn())
-        {
-            $table = $this->parser->getTable();
-
-            $fn = $this->getDeleteColumn($this->column, $table);
-
-            $method->setCodeLine($fn);
+            if ($this->parser->isDeleteColumn())
+            {
+                $fn = $this->getDeleteColumn($this->column, $table);
+            }
         }
 
         if ($this->parser->isDeleteTable())
         {
-            $table = $this->parser->getTable();
-
             $fn = $this->getDeleteTable($table);
-
-            $method->setCodeLine($fn);
         }
+
+        $method->setCodeLine($fn);
 
         $this->addMethod($method);
     }
