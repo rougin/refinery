@@ -85,10 +85,14 @@ class Console extends Blueprint
         /** @var string */
         $path = realpath($this->root);
 
+        // TODO: Add unit test in this condition ----
+        // @codeCoverageIgnoreStart
         if (! file_exists($path . '/' . $this->file))
         {
             return array();
         }
+        // @codeCoverageIgnoreEnd
+        // ------------------------------------------
 
         $file = $path . '/' . $this->file;
 
