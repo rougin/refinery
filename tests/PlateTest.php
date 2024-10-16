@@ -27,7 +27,7 @@ class PlateTest extends Testcase
     /**
      * @return void
      */
-    public function test_creating_migration()
+    public function test_creating_table()
     {
         $test = $this->findCommand('create');
 
@@ -35,7 +35,29 @@ class PlateTest extends Testcase
 
         $test->execute($input);
 
-        $expected = $this->getTemplate('SimpleTable');
+        $expected = $this->getTemplate('CreateTable');
+
+        $actual = $this->getActualFile($input['name']);
+
+        $this->assertEquals($expected, $actual);
+
+        $this->clearFiles();
+    }
+
+    /**
+     * @return void
+     */
+    public function test_creating_column()
+    {
+        $test = $this->findCommand('create');
+
+        $input = array('name' => 'add_name_in_users_table');
+        $input['--length'] = 100;
+        $input['--null'] = true;
+
+        $test->execute($input);
+
+        $expected = $this->getTemplate('CreateColumn');
 
         $actual = $this->getActualFile($input['name']);
 

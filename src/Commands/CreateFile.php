@@ -4,6 +4,8 @@ namespace Rougin\Refinery\Commands;
 
 use Rougin\Blueprint\Command;
 use Rougin\Classidy\Generator;
+use Rougin\Describe\Column;
+use Rougin\Refinery\Parser;
 use Rougin\Refinery\Refinery;
 use Rougin\Refinery\Template\Migration;
 
@@ -52,6 +54,15 @@ class CreateFile extends Command
     public function init()
     {
         $this->addArgument('name', 'Name of the migration file');
+
+        $this->addValueOption('auto-increment', 'Sets the "auto_increment" value', false);
+        $this->addValueOption('default', 'Sets the "default" value of the column');
+        $this->addOption('from-database', 'Creates a migration from the database');
+        $this->addValueOption('length', 'Sets the "constraint" value of the column', 50);
+        $this->addValueOption('null', 'Sets the column with a nullable value', false);
+        $this->addValueOption('primary', 'Sets the column as the primary key', false);
+        $this->addValueOption('type', 'Sets the data type of the column', 'varchar');
+        $this->addValueOption('unsigned', 'Sets the column with unsigned value', false);
     }
 
     /**
@@ -64,9 +75,20 @@ class CreateFile extends Command
         /** @var string */
         $name = $this->getArgument('name');
 
-        $style = $this->getNumberStyle();
+        $parser = new Parser($name);
 
         $class = new Migration($name);
+
+        $class->setParser($parser);
+
+        if ($parser->getColumn() && $parser->isCreateColumn())
+        {
+            $column = $parser->getColumn();
+
+            $column = $this->setColumn($column);
+
+            $class->withColumn($column);
+        }
 
         $maker = new Generator;
 
@@ -87,7 +109,18 @@ class CreateFile extends Command
     {
         $path = $this->path . '/migrations/';
 
-        $file = $path . date('YmdHis') . '_' . $name;
+        $style = $this->getNumberStyle();
+
+        // TODO: Get latest sequence from config ---
+        $prefix = null;
+        // -----------------------------------------
+
+        if ($style === Migration::STYLE_TIMESTAMP)
+        {
+            $prefix = date('YmdHis');
+        }
+
+        $file = $path . $prefix . '_' . $name;
 
         file_put_contents($file . '.php', $class);
     }
@@ -119,13 +152,53 @@ class CreateFile extends Command
     {
         $type = $this->getConfig('migration_type');
 
-        $style = Migration::TYPE_SEQUENCE;
+        $style = Migration::STYLE_SEQUENCE;
 
         if ($type === '\'timestamp\'')
         {
-            $style = Migration::TYPE_TIMESTAMP;
+            $style = Migration::STYLE_TIMESTAMP;
         }
 
         return $style;
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return \Rougin\Describe\Column
+     */
+    protected function setColumn($name)
+    {
+        $column = new Column;
+
+        $column->setField($name);
+
+        /** @var string */
+        $default = $this->getOption('default');
+        $column->setDefaultValue($default);
+
+        /** @var string */
+        $type = $this->getOption('type');
+        $column->setDataType(strtoupper($type));
+
+        /** @var integer */
+        $length = $this->getOption('length');
+        $column->setLength($length);
+
+        /** @var boolean */
+        $increment = $this->getOption('auto-increment');
+        $column->setAutoIncrement($increment);
+
+        /** @var boolean */
+        $null = $this->getOption('null');
+        $column->setNull($null);
+
+        /** @var boolean */
+        $unsigned = $this->getOption('unsigned');
+        $column->setUnsigned($unsigned);
+
+        /** @var boolean */
+        $primary = $this->getOption('primary');
+        return $column->setPrimary($primary);
     }
 }
