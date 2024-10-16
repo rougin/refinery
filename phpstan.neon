@@ -5,9 +5,9 @@ parameters:
     - tests
   excludePaths:
     analyse:
-      - tests/Ciacme/config
-      - tests/Ciacme/migrations
-      - tests/Ciacme/views
+      - tests/Fixture/Ciacme/config
+      - tests/Fixture/Ciacme/migrations
+      - tests/Fixture/Ciacme/views
   scanDirectories:
     - vendor/rougin/codeigniter/src
   ignoreErrors:
@@ -17,5 +17,3 @@ parameters:
     - '#^Access to property \$hostname on an unknown class CI_DB\.$#'
     - '#^Access to property \$password on an unknown class CI_DB\.$#'
     - '#^Access to property \$username on an unknown class CI_DB\.$#'
-    - '#^Constant APPPATH not found\.$#'
-    - '#^Constant ENVIRONMENT not found\.$#'

@@ -13,6 +13,11 @@ use Rougin\Refinery\Refinery;
 class CreateFile extends Command
 {
     /**
+     * @var \Rougin\Describe\Driver\DriverInterface|null
+     */
+    protected $driver = null;
+
+    /**
      * @var string
      */
     protected $name = 'create';
@@ -28,11 +33,21 @@ class CreateFile extends Command
     protected $path = '';
 
     /**
-     * @param \Rougin\Refinery\Refinery $combustor
+     * @param \Rougin\Refinery\Refinery $refinery
      */
-    public function __construct(Refinery $combustor)
+    public function __construct(Refinery $refinery)
     {
-        $this->path = $combustor->getAppPath();
+        $this->driver = $refinery->getDriver();
+
+        $this->path = $refinery->getAppPath();
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isEnabled()
+    {
+        return $this->driver !== null;
     }
 
     /**

@@ -4,5 +4,5 @@ build
 composer.lock
 docs
 refinery.yml
-tests/Ciacme/migrations
+tests/Fixture/Ciacme/migrations
 vendor
