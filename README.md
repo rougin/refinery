@@ -2,9 +2,8 @@
 
 [![Latest Version on Packagist][ico-version]][link-packagist]
 [![Software License][ico-license]][link-license]
-[![Build Status][ico-travis]][link-travis]
-[![Coverage Status][ico-scrutinizer]][link-scrutinizer]
-[![Quality Score][ico-code-quality]][link-code-quality]
+[![Build Status][ico-build]][link-build]
+[![Coverage Status][ico-coverage]][link-coverage]
 [![Total Downloads][ico-downloads]][link-downloads]
 
 Refinery is an extension and a command line interface of [Migrations Class](https://www.codeigniter.com/user_guide/libraries/migration.html) for the [Codeigniter](https://codeigniter.com/) framework. It uses the [Describe](https://roug.in/describe/) library for retrieving the database tables and as the basis for code generation.
@@ -221,18 +220,17 @@ $ composer test
 
 The MIT License (MIT). Please see [LICENSE][link-license] for more information.
 
-[ico-code-quality]: https://img.shields.io/scrutinizer/g/rougin/refinery.svg?style=flat-square
+[ico-build]: https://img.shields.io/github/actions/workflow/status/rougin/refinery/build.yml?style=flat-square
+[ico-coverage]: https://img.shields.io/codecov/c/github/rougin/refinery?style=flat-square
 [ico-downloads]: https://img.shields.io/packagist/dt/rougin/refinery.svg?style=flat-square
 [ico-license]: https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square
-[ico-scrutinizer]: https://img.shields.io/scrutinizer/coverage/g/rougin/refinery.svg?style=flat-square
-[ico-travis]: https://img.shields.io/travis/rougin/refinery/master.svg?style=flat-square
 [ico-version]: https://img.shields.io/packagist/v/rougin/refinery.svg?style=flat-square
 
+[link-build]: https://github.com/rougin/refinery/actions
 [link-changelog]: https://github.com/rougin/refinery/blob/master/CHANGELOG.md
-[link-code-quality]: https://scrutinizer-ci.com/g/rougin/refinery
 [link-contributors]: https://github.com/rougin/refinery/contributors
+[link-coverage]: https://app.codecov.io/gh/rougin/refinery
 [link-downloads]: https://packagist.org/packages/rougin/refinery
 [link-license]: https://github.com/rougin/refinery/blob/master/LICENSE.md
 [link-packagist]: https://packagist.org/packages/rougin/refinery
-[link-scrutinizer]: https://scrutinizer-ci.com/g/rougin/refinery/code-structure
-[link-travis]: https://travis-ci.org/rougin/refinery
+[link-upgrading]: https://github.com/rougin/refinery/blob/master/UPGRADING.md

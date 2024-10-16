@@ -2,22 +2,15 @@
 
 All notable changes to `Refinery` will be documented in this file.
 
-## [0.4.0](https://github.com/rougin/describe/compare/v0.3.0...v0.4.0) - Unreleased
+## [0.4.0](https://github.com/rougin/refinery/compare/v0.3.0...v0.4.0) - Unreleased
 
 ### Added
-- Parser for determining commands to be used
 
 ### Changed
-- Based all functions to `CI_Migration` class
-- Separated core functionality from commands
-- Messages in displaying all commmand outputs
-- `auto_increment` option to `auto-increment` in `create` command
 
 ### Removed
-- `rougin/blueprint` dependency
-- `sequential` option in `create` command
 
-## [0.3.0](https://github.com/rougin/describe/compare/v0.2.1...v0.3.0) - 2017-01-07
+## [0.3.0](https://github.com/rougin/refinery/compare/v0.2.1...v0.3.0) - 2017-01-07
 
 ### Added
 - Exceptions for specific errors
@@ -28,7 +21,7 @@ All notable changes to `Refinery` will be documented in this file.
 ### Changed
 - Improve code quality
 
-## [0.2.1](https://github.com/rougin/describe/compare/v0.2.0...v0.2.1) - 2016-09-07
+## [0.2.1](https://github.com/rougin/refinery/compare/v0.2.0...v0.2.1) - 2016-09-07
 
 ### Added
 - StyleCI for conforming code to PSR standards

@@ -1,67 +1,68 @@
 {
-    "name": "rougin/refinery",
-    "description": "\"Ready-to-eat\" migrations for the Codeigniter framework.",
-    "keywords": ["codeigniter", "database", "migrations", "refinery", "php"],
-    "homepage": "https://roug.in/refinery/",
-    "license": "MIT",
-    "authors":
-    [
-        {
-            "email": "rougingutib@gmail.com",
-            "homepage": "https://roug.in/",
-            "name": "Rougin Gutib",
-            "role": "Software Engineer"
-        }
-    ],
-    "require":
+  "name": "rougin/refinery",
+  "description": "\"Ready-to-eat\" Codeigniter 3 migrations.",
+  "keywords": ["codeigniter", "database-migrations", "php"],
+  "homepage": "https://roug.in/refinery/",
+  "license": "MIT",
+  "authors":
+  [
     {
-        "php": ">=5.4.0",
-        "rougin/describe": ">=1.6.0",
-        "rougin/spark-plug": "~0.6",
-        "symfony/console": ">=2.8.0"
-    },
-    "require-dev":
-    {
-        "phpunit/phpunit": "~4.2|~5.7",
-        "rougin/codeigniter": "~3.1.0",
-        "scrutinizer/ocular": "~1.1.0"
-    },
-    "bin":
-    [
-        "bin/refinery",
-        "bin/refinery.php"
-    ],
-    "autoload":
-    {
-        "psr-4":
-        {
-            "Rougin\\Refinery\\": "src"
-        }
-    },
-    "autoload-dev":
-    {
-        "psr-4":
-        {
-            "Rougin\\Refinery\\": "tests"
-        }
-    },
-    "scripts":
-    {
-        "test": "phpunit"
-    },
-    "extra":
-    {
-        "branch-alias":
-        {
-            "dev-master": "1.0-dev"
-        }
-    },
-    "suggest":
-    {
-        "rougin/codeigniter": "Packaged \"system\" folder of the Codeigniter framework.",
-        "rougin/combustor": "CRUD generator for the Codeigniter framework.",
-        "rougin/credo": "Doctrine ORM integration for the Codeigniter framework.",
-        "rougin/ignite": "Composer-based project for the Codeigniter framework.",
-        "rougin/wildfire": "Query Builder wrapper for the Codeigniter framework."
+      "email": "rougingutib@gmail.com",
+      "homepage": "https://roug.in/",
+      "name": "Rougin Gutib",
+      "role": "Software Engineer"
     }
+  ],
+  "require":
+  {
+    "php": ">=5.4.0",
+    "rougin/blueprint": "dev-master",
+    "rougin/describe": "dev-master"
+  },
+  "require-dev":
+  {
+    "phpunit/phpunit": "~4.2|~5.7|~6.0|~7.0|~8.0|~9.0",
+    "rougin/codeigniter": "~3.0",
+    "rougin/spark-plug": "~0.5",
+    "sanmai/phpunit-legacy-adapter": "~6.1|~8.0"
+  },
+  "bin":
+  [
+    "bin/refinery",
+    "bin/refinery.php"
+  ],
+  "autoload":
+  {
+    "psr-4":
+    {
+      "Rougin\\Refinery\\": "src"
+    }
+  },
+  "autoload-dev":
+  {
+    "psr-4":
+    {
+      "Rougin\\Refinery\\": "tests"
+    }
+  },
+  "scripts":
+  {
+    "test": "phpunit"
+  },
+  "extra":
+  {
+    "branch-alias":
+    {
+      "dev-master": "1.0-dev"
+    }
+  },
+  "suggest":
+  {
+    "rougin/codeigniter": "Packaged \"system\" of Codeigniter 3.",
+    "rougin/combustor": "MVC code generator for Codeigniter 3.",
+    "rougin/credo": "Doctrine ORM wrapper for Codeigniter 3.",
+    "rougin/ignite": "Yet another Codeigniter 3 project template.",
+    "rougin/spark-plug": "Codeigniter 3 projects as variables.",
+    "rougin/wildfire": "Query Builder wrapper for Codeigniter 3."
+  }
 }

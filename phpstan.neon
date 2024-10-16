@@ -1,0 +1,10 @@
+parameters:
+  level: 9
+  paths:
+    - src
+    - tests
+  excludePaths:
+    analyse:
+      - tests/Weblog/application/views
+  scanDirectories:
+    - vendor/rougin/codeigniter/src
