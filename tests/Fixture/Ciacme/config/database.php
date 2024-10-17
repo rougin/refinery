@@ -76,11 +76,11 @@ $query_builder = true;
 
 $db['default'] = array(
     'dsn'    => '',
-    'hostname' => 'sqlite:' . APPPATH . 'storage/refinery.db',
-    'username' => '',
-    'password' => '',
-    'database' => '',
-    'dbdriver' => 'pdo',
+    'hostname' => '127.0.0.1',
+    'username' => 'rfnry',
+    'password' => 'rfnry',
+    'database' => 'rfnry',
+    'dbdriver' => 'mysqli',
     'dbprefix' => '',
     'pconnect' => false,
     'db_debug' => (ENVIRONMENT !== 'production'),
