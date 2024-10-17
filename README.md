@@ -41,7 +41,7 @@ $ vendor/bin/refinery create create_users_table
 ```
 
 ``` php
-// application/migrations/20241017173347_create_users_table.php
+// acme/application/migrations/20241017173347_create_users_table.php
 
 use Rougin\Refinery\Migration;
 
@@ -93,7 +93,7 @@ $ vendor/bin/refinery create create_users_table --from-database
 ```
 
 ``` php
-// application/migrations/20180621090905_create_users_table.php
+// acme/application/migrations/20180621090905_create_users_table.php
 
 defined('BASEPATH') OR exit('No direct script access allowed');
 
@@ -163,7 +163,7 @@ $ vendor/bin/refinery create add_name_in_users_table
 ```
 
 ``` php
-// application/migrations/20180621090953_add_name_in_users_table.php
+// acme/application/migrations/20180621090953_add_name_in_users_table.php
 
 defined('BASEPATH') OR exit('No direct script access allowed');
 
