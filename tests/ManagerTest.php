@@ -2,194 +2,272 @@
 
 namespace Rougin\Refinery;
 
-use Rougin\Describe\Column;
-use Rougin\SparkPlug\SparkPlug;
+use Symfony\Component\Console\Tester\CommandTester;
 
 /**
- * Manager Test
- *
  * @package Refinery
- * @author  Rougin Gutib <rougingutib@gmail.com>
+ *
+ * @author Rougin Gutib <rougingutib@gmail.com>
  */
-class ManagerTest extends \PHPUnit_Framework_TestCase
+class ManagerTest extends Testcase
 {
     /**
-     * @var string
+     * @var \Rougin\Refinery\Console
      */
-    protected $path;
+    protected $app;
 
     /**
-     * Initializes the manager instance.
-     *
+     * @var \Rougin\Describe\Driver\DriverInterface
+     */
+    protected $describe;
+
+    /**
      * @return void
      */
-    public function setUp()
+    public function doSetUp()
     {
-        $separator = (string) DIRECTORY_SEPARATOR;
+        $app = new Console(__DIR__ . '/Fixture');
 
-        $this->path = __DIR__ . $separator . 'Weblog/';
+        /** @var \Rougin\Slytherin\Container\ContainerInterface */
+        $container = $app->getContainer();
 
-        $this->manager = new Manager($this->path);
+        $class = 'Rougin\Describe\Driver\DriverInterface';
+
+        /** @var \Rougin\Describe\Driver\DriverInterface */
+        $describe = $container->get($class);
+
+        $this->app = $app;
+
+        $this->describe = $describe;
     }
 
     /**
-     * Tests Manager::filename.
-     *
      * @return void
      */
-    public function testFilenameMethod()
+    public function test_empty_migrations()
     {
-        $expected = '001_create_users_table.php';
+        $test = $this->findCommand('migrate');
 
-        $name = (string) 'create_users_table';
+        $test->execute(array());
 
-        $result = $this->manager->filename($name);
+        $expected = '[PASS] Nothing to migrate.';
 
-        $this->assertEquals($expected, $result);
+        $actual = $this->getActualDisplay($test);
+
+        $this->assertEquals($expected, $actual);
     }
 
     /**
-     * Tests Manager::create.
+     * @depends test_empty_migrations
      *
      * @return void
      */
-    public function testCreateMethod()
+    public function test_migrating_files()
     {
-        $name = (string) 'create_users_table';
+        $this->useMysqlConfig();
 
-        $builder = new Builder;
+        $this->clearFiles();
 
-        $content = $builder->make((string) $name);
+        // Create the required migration files -------------
+        $test = $this->findCommand('create');
 
-        $filename = $this->manager->filename($name);
+        $input = array('name' => 'create_users_table');
+        $test->execute($input);
 
-        $this->manager->create($filename, $content);
+        $date = date('YmdHis');
 
-        $path = (string) __DIR__ . '/Weblog/templates';
+        sleep(1);
 
-        $template = $path . '/CreateUsersTable.txt';
+        $input = array('name' => 'add_name_in_users_table');
+        $input['--length'] = 100;
+        $input['--null'] = true;
+        $test->execute($input);
+        // -------------------------------------------------
 
-        $expected = file_get_contents($template);
+        // Perform the migration of the first file ---
+        $test = $this->findCommand('migrate');
 
-        $path = (string) $this->path . 'migrations';
+        $test->execute(array('--target' => $date));
+        // -------------------------------------------
 
-        $filename = $path . '/001_create_users_table.php';
+        $expected = 1;
 
-        $result = file_get_contents($filename);
+        $actual = $this->describe->columns('users');
 
-        $this->assertEquals($expected, $result);
-
-        return (string) $filename;
+        $this->assertCount($expected, $actual);
     }
 
     /**
-     * Tests Manager::migrations.
+     * @depends test_migrating_files
      *
-     * @depends testCreateMethod
-     *
-     * @param  string $filename
      * @return void
      */
-    public function testMigrationsMethod($filename)
+    public function test_migrating_next_file()
     {
-        $expected = array((string) $filename);
+        $test = $this->findCommand('migrate');
 
-        $result = $this->manager->migrations();
+        $test->execute(array());
 
-        $result = array_values($result);
+        $expected = 2;
 
-        $this->assertEquals($expected, $result);
+        $actual = $this->describe->columns('users');
+
+        $this->assertCount($expected, $actual);
     }
 
     /**
-     * Tests Manager::migrate.
+     * @depends test_migrating_next_file
      *
-     * @depends testCreateMethod
-     *
-     * @param  string $filename
      * @return void
      */
-    public function testMigrateMethod($filename)
+    public function test_nothing_to_migrate()
     {
-        $expected = substr(basename($filename), 0, 3);
+        $test = $this->findCommand('migrate');
 
-        $result = $this->manager->migrate();
+        $test->execute(array());
 
-        $this->assertEquals($expected, $result);
+        $expected = '[PASS] Nothing to migrate.';
 
-        return $filename;
+        $actual = $this->getActualDisplay($test);
+
+        $this->assertEquals($expected, $actual);
     }
 
     /**
-     * Tests Manager::reset.
+     * @depends test_reset_to_0
      *
-     * @depends testMigrateMethod
-     *
-     * @param  string $filename
      * @return void
      */
-    public function testResetMethod($filename)
+    public function test_nothing_to_rollback()
     {
-        $result = $this->manager->reset();
+        $test = $this->findCommand('rollback');
 
-        $expected = (string) '000';
+        $test->execute(array());
 
-        $this->assertEquals($expected, $result);
+        $expected = '[PASS] Nothing to roll back.';
 
-        return $filename;
+        $actual = $this->getActualDisplay($test);
+
+        $this->assertEquals($expected, $actual);
     }
 
     /**
-     * Tests Manager::migrate with a specified version.
+     * @depends test_rolling_back
      *
-     * @depends testResetMethod
-     *
-     * @param  string $filename
      * @return void
      */
-    public function testMigrateMethodWithVersion($filename)
+    public function test_reset_to_0()
     {
-        $name = 'add_name_in_users_table';
+        $this->expectException('Exception');
 
-        $builder = new Builder;
+        $test = $this->findCommand('reset');
 
-        $column = new Column;
+        $test->execute(array());
 
-        $column->setLength(100);
-        $column->setDataType('VARCHAR');
-
-        $content = $builder->column($column)->make($name);
-
-        $file = $this->manager->filename($name);
-
-        $this->manager->create($file, $content);
-
-        $expected = (string) '002';
-
-        $result = $this->manager->migrate($expected);
-
-        $this->assertEquals($expected, $result);
-
-        $this->manager->reset();
-
-        $path = $this->path . 'migrations';
-
-        unlink($filename);
-
-        unlink($path . '/002_add_name_in_users_table.php');
+        $this->describe->columns('users');
     }
 
     /**
-     * Tests Manager::current.
+     * @depends test_nothing_to_migrate
      *
      * @return void
      */
-    public function testCurrentMethod()
+    public function test_rolling_back()
     {
-        $result = $this->manager->current();
+        $test = $this->findCommand('rollback');
 
-        $expected = '0';
+        $test->execute(array());
 
-        $this->assertEquals($expected, $result);
+        $expected = 1;
+
+        $actual = $this->describe->columns('users');
+
+        $this->assertCount($expected, $actual);
+    }
+
+    /**
+     * @return void
+     */
+    protected function clearFiles()
+    {
+        $path = $this->app->getAppPath();
+
+        /** @var string[] */
+        $files = glob($path . '/migrations/*.php');
+
+        foreach ($files as $file)
+        {
+            unlink($file);
+        }
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return \Symfony\Component\Console\Tester\CommandTester
+     */
+    protected function findCommand($name)
+    {
+        return new CommandTester($this->app->make()->find($name));
+    }
+
+    /**
+     * @param \Symfony\Component\Console\Tester\CommandTester $tester
+     *
+     * @return string
+     */
+    protected function getActualDisplay(CommandTester $tester)
+    {
+        $actual = $tester->getDisplay();
+
+        $actual = str_replace("\r\n", '', $actual);
+
+        return str_replace("\n", '', $actual);
+    }
+
+    /**
+     * @param string $type
+     *
+     * @return void
+     */
+    protected function useDatabaseConfig($type)
+    {
+        $path = $this->app->getAppPath();
+
+        // Replace the "database.php" file --------
+        $file = $path . '/config/database.php';
+
+        $new = $path . '/config/database.' . $type;
+        /** @var string */
+        $new = file_get_contents($new);
+
+        file_put_contents($file, $new);
+        // ----------------------------------------
+
+        // Reset the "migration.php" config file ---
+        $file = $path . '/config/migration.php';
+
+        $new = $path . '/config/migration.bak';
+        /** @var string */
+        $new = file_get_contents($new);
+
+        file_put_contents($file, $new);
+        // -----------------------------------------
+    }
+
+    /**
+     * @return void
+     */
+    protected function useMysqlConfig()
+    {
+        $this->useDatabaseConfig('mysql');
+    }
+
+    /**
+     * @return void
+     */
+    protected function useSqliteConfig()
+    {
+        $this->useDatabaseConfig('sqlite');
     }
 }

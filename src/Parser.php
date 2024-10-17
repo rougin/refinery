@@ -2,47 +2,49 @@
 
 namespace Rougin\Refinery;
 
+use Rougin\Refinery\Template\Migration;
+
 /**
- * Parser
- *
  * @package Refinery
+ *
  * @author  Rougin Gutib <rougingutib@gmail.com>
  */
 class Parser
 {
     /**
-     * @var string
+     * @var string|null
      */
-    protected $column = '';
+    protected $column = null;
 
     /**
      * @var string
      */
-    protected $command = '';
+    protected $type;
 
     /**
      * @var string
      */
-    protected $table = '';
+    protected $table;
 
     /**
-     * Initializes the parser instance.
-     *
      * @param string $name
      */
     public function __construct($name)
     {
-        $allowed = implode('|', $this->commands());
+        // Determine the table and its name prefix ---
+        $allowed = implode('|', $this->getTypes());
 
         $pattern = '/(' . $allowed . ')_(.*)_table/';
 
         preg_match($pattern, $name, $matches);
 
-        $this->table = (string) $matches[2];
+        $this->table = $matches[2];
 
-        $this->command = (string) $matches[1];
+        $this->type = $matches[1];
+        // -------------------------------------------
 
-        $pattern = (string) '/(.*)_in_(.*)/';
+        // Check if the specified pattern matches in the name ---
+        $pattern = '/(.*)_in_(.*)/';
 
         preg_match($pattern, $matches[2], $matches);
 
@@ -52,54 +54,70 @@ class Parser
 
             $this->table = $matches[2];
         }
+        // ------------------------------------------------------
     }
 
     /**
-     * Returns an array of commands.
-     *
-     * @return string[]
+     * @return string|null
      */
-    public function commands()
-    {
-        $commands = array();
-
-        $commands[] = 'add';
-        $commands[] = 'create';
-        $commands[] = 'delete';
-        $commands[] = 'modify';
-        $commands[] = 'remove';
-        $commands[] = 'update';
-
-        return $commands;
-    }
-
-    /**
-     * Returns the command.
-     *
-     * @return string
-     */
-    public function command()
-    {
-        return $this->command;
-    }
-
-    /**
-     * Returns the column.
-     *
-     * @return string
-     */
-    public function column()
+    public function getColumn()
     {
         return $this->column;
     }
 
     /**
-     * Returns the table.
-     *
      * @return string
      */
-    public function table()
+    public function getType()
+    {
+        return $this->type;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTable()
     {
         return $this->table;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isCreateColumn()
+    {
+        return ($this->getType() === Migration::TYPE_ADD || $this->getType() === Migration::TYPE_CREATE) && $this->getColumn() !== null;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isDeleteColumn()
+    {
+        return ($this->getType() === Migration::TYPE_REMOVE || $this->getType() === Migration::TYPE_DELETE) && $this->getColumn() !== null;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isDeleteTable()
+    {
+        return $this->getType() === Migration::TYPE_DELETE && $this->getColumn() === null;
+    }
+
+    /**
+     * @return string[]
+     */
+    protected function getTypes()
+    {
+        $items = array(Migration::TYPE_ADD);
+
+        $items[] = Migration::TYPE_CREATE;
+        $items[] = Migration::TYPE_DELETE;
+        $items[] = Migration::TYPE_MODIFY;
+        $items[] = Migration::TYPE_REMOVE;
+        $items[] = Migration::TYPE_UPDATE;
+
+        return $items;
     }
 }

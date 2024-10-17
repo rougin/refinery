@@ -2,18 +2,17 @@
 
 namespace Rougin\Refinery;
 
-use Rougin\SparkPlug\SparkPlug;
+use Rougin\SparkPlug\Controller;
 
 /**
- * Manager
- *
  * @package Refinery
- * @author  Rougin Gutib <rougingutib@gmail.com>
+ *
+ * @author Rougin Gutib <rougingutib@gmail.com>
  */
 class Manager
 {
     /**
-     * @var \Rougin\SparkPlug\SparkPlug
+     * @var \Rougin\SparkPlug\Controller
      */
     protected $ci;
 
@@ -23,194 +22,171 @@ class Manager
     protected $path;
 
     /**
-     * Initializes the migration instance.
-     *
-     * @param string $path
+     * @param \Rougin\SparkPlug\Controller $ci
+     * @param string                       $path
      */
-    public function __construct($path)
+    public function __construct(Controller $ci, $path)
     {
-        $globals = array('PRJK' => 'Refinery');
+        $this->ci = $ci;
 
-        $ci = new SparkPlug($globals, array());
+        $this->ci->load->library('migration');
 
-        substr($path, -1) !== '/' && $path .= '/';
-
-        $this->path = (string) $path;
-
-        $this->ci = $ci->set('APPPATH', $path);
+        $this->path = $path;
     }
 
     /**
-     * Creates a new file to the "migrations" directory.
+     * @param boolean $reverse
      *
-     * @param  string $filename
-     * @param  string $content
-     * @return void
+     * @return array<string, string>[]
      */
-    public function create($filename, $content)
+    public function getMigrations($reverse = false)
     {
-        $path = $this->path . '/migrations/';
+        /** @var array<string, string> */
+        $items = $this->ci->migration->find_migrations();
 
-        $filename = (string) $path . $filename;
+        if ($reverse)
+        {
+            $keys = array_keys($items);
+            $keys = array_reverse($keys);
 
-        file_put_contents($filename, $content);
-    }
+            array_shift($keys);
+            $keys[] = '0';
 
-    /**
-     * Returns the current migration version.
-     *
-     * @return string
-     */
-    public function current()
-    {
-        return $this->get('migration_version');
-    }
+            $items = array_values($items);
+            $items = array_reverse($items);
 
-    /**
-     * Returns a generated migration filename.
-     *
-     * @param  string $name
-     * @return string
-     */
-    public function filename($name)
-    {
-        $type = $this->get('migration_type', "'timestamp'");
-
-        $prefix = (string) date('YmdHis', (integer) time());
-
-        if ($type === "'sequential'") {
-            $path = (string) $this->path . '/migrations';
-
-            $path = new \FilesystemIterator($path);
-
-            $regex = new \RegexIterator($path, '/^.+\.php$/i');
-
-            $items = count(iterator_to_array($regex));
-
-            $prefix = (string) sprintf('%03d', $items + 1);
+            /** @var array<string, string> */
+            $items = array_combine($keys, $items);
         }
 
-        return (string) $prefix . '_' . $name . '.php';
-    }
+        $result = array();
 
-    /**
-     * Returns an array of database migrations.
-     *
-     * @return array
-     */
-    public function migrations()
-    {
-        $migration = $this->load();
-
-        $items = $migration->find_migrations();
-
-        $this->set('migration_enabled', 'false');
-
-        return (array) $items;
-    }
-
-    /**
-     * Migrates to a specific schema version.
-     *
-     * @param  string $version
-     * @return boolean|string
-     */
-    public function migrate($version = null)
-    {
-        $migration = $this->load();
-
-        if ($version !== null) {
-            $result = $migration->version($version);
-        } else {
-            $result = $migration->latest();
+        foreach ($items as $current => $file)
+        {
+            $result[] = array('file' => $file, 'version' => $current);
         }
-
-        if ($result !== true) {
-            $this->set('migration_version', $result);
-        }
-
-        $this->set('migration_enabled', 'false');
 
         return $result;
     }
 
     /**
-     * Resets the migration schema.
+     * @param string $version
      *
      * @return boolean
      */
-    public function reset()
+    public function migrate($version)
     {
-        $migration = $this->load();
+        $this->startMigration();
 
-        $result = (string) $migration->version(0);
+        $this->ci->load->library('migration');
 
-        $result = $result === '000' ? 0 : $result;
+        $self = $this->ci->migration;
 
-        $this->set('migration_version', $result);
+        $result = $self->version($version);
 
-        $this->set('migration_enabled', 'false');
+        $this->stopMigration();
 
-        return (string) $result;
+        return is_string($result);
     }
 
     /**
-     * Returns a value from migration configuration.
-     *
-     * @param  string $key
-     * @param  mixed  $default
-     * @return mixed
+     * @return string
      */
-    protected function get($key, $default = null)
+    public function getCurrentVersion()
     {
         $file = $this->path . '/config/migration.php';
 
-        $config = file_get_contents((string) $file);
+        /** @var string */
+        $config = file_get_contents($file);
 
-        $pattern = '/\$config\[\\\'' . $key . '\\\'\] = (.*?);/i';
+        $pattern = '/\$config\[\\\'migration_version\\\'\] = (.*?);/i';
 
         preg_match($pattern, $config, $matches);
 
-        return $matches ? $matches[1] : $default;
+        return $matches ? $matches[1] : '';
     }
 
     /**
-     * Loads the migration instance.
-     *
-     * @return \CI_Migration
+     * @return string
      */
-    protected function load()
+    public function getLastVersion()
     {
-        $key = 'migration_enabled';
+        $items = $this->getMigrations();
 
-        $ci = $this->ci->instance();
+        $current = $this->getCurrentVersion();
 
-        $this->set($key, 'true');
+        $parsed = null;
 
-        $ci->load->library('migration');
+        foreach ($items as $index => $item)
+        {
+            if (strtotime($item['version']) !== strtotime($current))
+            {
+                continue;
+            }
 
-        return $ci->migration;
+            if (array_key_exists($index - 1, $items))
+            {
+                $parsed = $items[$index - 1];
+
+                break;
+            }
+        }
+
+        return $parsed ? $parsed['version'] : '0';
     }
 
     /**
-     * Changes the value from migration configuration.
+     * @return string
+     */
+    public function getLatestVersion()
+    {
+        /** @var array<string, string> */
+        $items = $this->ci->migration->find_migrations();
+
+        if (count($items) === 0)
+        {
+            return '0';
+        }
+
+        $keys = array_keys($items);
+
+        return $keys[count($keys) - 1];
+    }
+
+    /**
+     * @param string $version
      *
-     * @param  string $key
-     * @param  string $value
      * @return void
      */
-    protected function set($key, $value)
+    public function saveLatest($version)
     {
-        $file = (string) $this->path . '/config/migration.php';
+        $file = $this->path . '/config/migration.php';
 
-        $replace = '$config[\'' . $key . '\'] = ' . $value . ';';
+        $replace = '$config[\'migration_version\'] = ' . $version . ';';
 
-        $config = file_get_contents((string) $file);
+        /** @var string */
+        $config = file_get_contents($file);
 
-        $pattern = '/\$config\[\\\'' . $key . '\\\'\] = (.*?);/i';
+        $pattern = '/\$config\[\\\'migration_version\\\'\] = (.*?);/i';
 
         $result = preg_replace($pattern, $replace, $config);
 
-        file_put_contents((string) $file, (string) $result);
+        file_put_contents($file, $result);
+    }
+
+    /**
+     * @return void
+     */
+    protected function startMigration()
+    {
+        $this->ci->config->set_item('migration_enabled', 'true');
+    }
+
+    /**
+     * @return void
+     */
+    protected function stopMigration()
+    {
+        $this->ci->config->set_item('migration_enabled', 'false');
     }
 }
