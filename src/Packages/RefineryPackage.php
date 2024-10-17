@@ -2,6 +2,7 @@
 
 namespace Rougin\Refinery\Packages;
 
+use Rougin\Refinery\Manager;
 use Rougin\Refinery\Refinery;
 use Rougin\Slytherin\Container\ContainerInterface;
 use Rougin\Slytherin\Integration\Configuration;
@@ -45,6 +46,10 @@ class RefineryPackage implements IntegrationInterface
             $class = $container->get($name);
 
             $app->setApp($class);
+
+            $manager = new Manager($class, $this->root);
+
+            $app->setManager($manager);
         }
 
         $name = 'Rougin\Describe\Driver\DriverInterface';

@@ -23,6 +23,11 @@ class Refinery
     protected $driver = null;
 
     /**
+     * @var \Rougin\Refinery\Manager|null
+     */
+    protected $manager = null;
+
+    /**
      * @var string
      */
     protected $root;
@@ -56,6 +61,14 @@ class Refinery
     }
 
     /**
+     * @return \Rougin\Refinery\Manager|null
+     */
+    public function getManager()
+    {
+        return $this->manager;
+    }
+
+    /**
      * @return string
      */
     public function getRootPath()
@@ -83,6 +96,18 @@ class Refinery
     public function setDriver(DriverInterface $driver)
     {
         $this->driver = $driver;
+
+        return $this;
+    }
+
+    /**
+     * @param \Rougin\Refinery\Manager $manager
+     *
+     * @return self
+     */
+    public function setManager(Manager $manager)
+    {
+        $this->manager = $manager;
 
         return $this;
     }

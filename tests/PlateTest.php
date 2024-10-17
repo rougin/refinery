@@ -191,5 +191,4 @@ class PlateTest extends Testcase
 
         return str_replace("\r\n", "\n", $result);
     }
-
 }

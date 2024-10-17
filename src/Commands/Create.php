@@ -14,7 +14,7 @@ use Rougin\Refinery\Template\Migration;
  *
  * @author Rougin Gutib <rougingutib@gmail.com>
  */
-class CreateFile extends Command
+class Create extends Command
 {
     /**
      * @var \Rougin\Describe\Driver\DriverInterface|null
