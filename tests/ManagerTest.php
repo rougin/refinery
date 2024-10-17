@@ -39,8 +39,6 @@ class ManagerTest extends Testcase
         $this->app = $app;
 
         $this->describe = $describe;
-
-        $this->useMysqlConfig();
     }
 
     /**
@@ -48,6 +46,8 @@ class ManagerTest extends Testcase
      */
     public function test_migrating_files()
     {
+        $this->useMysqlConfig();
+
         $this->clearFiles();
 
         // Create the required migration files -------------
@@ -100,18 +100,18 @@ class ManagerTest extends Testcase
      *
      * @return void
      */
-    // public function test_rolling_back()
-    // {
-    //     $test = $this->findCommand('rollback');
+    public function test_rolling_back()
+    {
+        $test = $this->findCommand('rollback');
 
-    //     $test->execute(array());
+        $test->execute(array());
 
-    //     $expected = 1;
+        $expected = 1;
 
-    //     $actual = $this->describe->columns('users');
+        $actual = $this->describe->columns('users');
 
-    //     $this->assertCount($expected, $actual);
-    // }
+        $this->assertCount($expected, $actual);
+    }
 
     /**
      * @return void
@@ -181,8 +181,6 @@ class ManagerTest extends Testcase
 
         file_put_contents($file, $new);
         // -----------------------------------------
-
-        $this->clearFiles();
     }
 
     /**

@@ -95,8 +95,6 @@ class Migrator extends Command
 
             $name = substr(basename($file), 15, -4);
 
-            $this->showText($version);
-
             $this->showText($before . ' "' . $name . '"...');
 
             $this->manager->migrate($version);
