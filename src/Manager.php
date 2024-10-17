@@ -65,6 +65,11 @@ class Manager
     {
         $files = $this->getMigrations();
 
+        if (count($files) === 0)
+        {
+            return array();
+        }
+
         $parsed = array();
 
         foreach (array_reverse($files) as $item)
@@ -79,13 +84,31 @@ class Manager
             }
         }
 
-        /** @var array<string, string> */
-        $last = end($files);
+        /**
+         * By default, it should always return the first file
+         * with its version number always defined to "0".
+         */
+        $last = $files[0];
 
-        /** @var array<string, string> */
+        /** @var array<string, string>|false */
         $next = end($parsed);
 
-        $last['version'] = $next['version'];
+        $prev = 0;
+
+        /**
+         * If there is a previous file before the specified version,
+         * use that as the new version but the last migration file is
+         * still the same.
+         */
+        if ($next !== false)
+        {
+            /** @var array<string, string> */
+            $last = end($files);
+
+            $prev = $next['version'];
+        }
+
+        $last['version'] = $prev;
 
         return $last;
     }

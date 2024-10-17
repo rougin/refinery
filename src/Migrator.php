@@ -39,6 +39,8 @@ class Migrator extends Command
         $manager = $refinery->getManager();
 
         $this->manager = $manager;
+
+        $this->driver = $refinery->getDriver();
     }
 
     /**
@@ -52,21 +54,33 @@ class Migrator extends Command
     }
 
     /**
+     * Checks whether the command is enabled or not in the current environment.
+     *
+     * @return boolean
+     */
+    public function isEnabled()
+    {
+        return $this->driver !== null;
+    }
+
+    /**
      * Executes the command.
      *
      * @return integer
      */
     public function run()
     {
-        $files = $this->manager->getMigrations();
-
         $latest = $this->manager->getLatestVersion();
 
-        if ($files && $this->type === self::TYPE_ROLLBACK)
+        $files = $this->manager->getMigrations();
+
+        $toMigrate = $this->type === self::TYPE_MIGRATE;
+
+        if (! $toMigrate)
         {
             $last = $this->manager->getLastMigration($latest);
 
-            $files = array($last);
+            $files = $latest === '0' ? array() : array($last);
         }
 
         $current = null;
@@ -81,7 +95,7 @@ class Migrator extends Command
 
             $file = $item['file'];
 
-            if ($this->type === self::TYPE_MIGRATE)
+            if ($toMigrate)
             {
                 $before = 'Migrating';
 
@@ -104,13 +118,15 @@ class Migrator extends Command
             $current = $version;
         }
 
-        if ($current)
+        if ($current !== null)
         {
             $this->manager->saveLatest($current);
         }
         else
         {
-            $this->showPass('Nothing to migrate.');
+            $text = $toMigrate ? 'migrate' : 'roll back';
+
+            $this->showPass('Nothing to ' . $text . '.');
         }
 
         return self::RETURN_SUCCESS;
