@@ -97,6 +97,8 @@ class CreateFile extends Command
 
         $this->createFile($name, $result);
 
+        $this->showPass('"' . $name . '" successfully created!');
+
         return self::RETURN_SUCCESS;
     }
 
