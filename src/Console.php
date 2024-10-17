@@ -85,28 +85,26 @@ class Console extends Blueprint
         /** @var string */
         $path = realpath($this->root);
 
-        // TODO: Add unit test in this condition ----
-        // @codeCoverageIgnoreStart
-        if (! file_exists($path . '/' . $this->file))
+        $data = array();
+
+        if (file_exists($path . '/' . $this->file))
         {
-            return array();
+            $file = $path . '/' . $this->file;
+
+            /** @var string */
+            $file = file_get_contents($file);
+
+            // Replace the constant with root path ----
+            $search = '%%CURRENT_DIRECTORY%%';
+
+            $file = str_replace($search, $path, $file);
+            // ----------------------------------------
+
+            /** @var array<string, mixed> */
+            $data = Yaml::parse($file);
         }
-        // @codeCoverageIgnoreEnd
-        // ------------------------------------------
 
-        $file = $path . '/' . $this->file;
-
-        /** @var string */
-        $file = file_get_contents($file);
-
-        // Replace the constant with root path ----
-        $search = '%%CURRENT_DIRECTORY%%';
-
-        $file = str_replace($search, $path, $file);
-        // ----------------------------------------
-
-        /** @var array<string, mixed> */
-        return Yaml::parse($file);
+        return $data;
     }
 
     /**

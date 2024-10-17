@@ -106,7 +106,7 @@ class Create extends Command
      * @param string $name
      * @param string $class
      *
-     * @return void
+     * @return string
      */
     protected function createFile($name, $class)
     {

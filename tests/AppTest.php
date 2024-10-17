@@ -3,8 +3,6 @@
 namespace Rougin\Refinery;
 
 /**
- * @runTestsInSeparateProcesses
- *
  * @package Refinery
  *
  * @author Rougin Gutib <rougingutib@gmail.com>
@@ -32,9 +30,9 @@ class AppTest extends Testcase
     {
         $app = new Console(__DIR__ . '/../');
 
-        $expected = 'Rougin\Blueprint\Wrapper';
-
         $actual = $app->make()->find('initialize');
+
+        $expected = 'Rougin\Blueprint\Wrapper';
 
         $this->assertInstanceOf($expected, $actual);
     }
