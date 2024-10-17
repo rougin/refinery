@@ -62,10 +62,10 @@ class DescribePackage implements IntegrationInterface
         $config['password'] = $ci->db->password;
         $config['database'] = $ci->db->database;
 
-        if (empty($config['hostname']))
-        {
-            $config['hostname'] = $ci->db->dsn;
-        };
+        $empty = empty($config['hostname']);
+
+        $hostname = $config['hostname'];
+        $hostname = $empty ? $ci->db->dsn : $hostname;
 
         return $config;
     }

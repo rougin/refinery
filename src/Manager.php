@@ -35,82 +35,38 @@ class Manager
     }
 
     /**
+     * @param boolean $reverse
+     *
      * @return array<string, string>[]
      */
-    public function getMigrations()
+    public function getMigrations($reverse = false)
     {
         /** @var array<string, string> */
         $items = $this->ci->migration->find_migrations();
 
+        if ($reverse)
+        {
+            $keys = array_keys($items);
+            $keys = array_reverse($keys);
+
+            array_shift($keys);
+            $keys[] = '0';
+
+            $items = array_values($items);
+            $items = array_reverse($items);
+
+            /** @var array<string, string> */
+            $items = array_combine($keys, $items);
+        }
+
         $result = array();
 
-        foreach ($items as $version => $file)
+        foreach ($items as $current => $file)
         {
-            $row = array('file' => $file);
-
-            $row['version'] = $version;
-
-            $result[] = $row;
+            $result[] = array('file' => $file, 'version' => $current);
         }
 
         return $result;
-    }
-
-    /**
-     * @param string $version
-     *
-     * @return array<string, string>
-     */
-    public function getLastMigration($version)
-    {
-        $files = $this->getMigrations();
-
-        if (count($files) === 0)
-        {
-            return array();
-        }
-
-        $parsed = array();
-
-        foreach (array_reverse($files) as $item)
-        {
-            $current = $item['version'];
-
-            if (strtotime($current) < strtotime($version))
-            {
-                $parsed[] = $item;
-
-                break;
-            }
-        }
-
-        /**
-         * By default, it should always return the first file
-         * with its version number always defined to "0".
-         */
-        $last = $files[0];
-
-        /** @var array<string, string>|false */
-        $next = end($parsed);
-
-        $prev = 0;
-
-        /**
-         * If there is a previous file before the specified version,
-         * use that as the new version but the last migration file is
-         * still the same.
-         */
-        if ($next !== false)
-        {
-            /** @var array<string, string> */
-            $last = end($files);
-
-            $prev = $next['version'];
-        }
-
-        $last['version'] = $prev;
-
-        return $last;
     }
 
     /**
@@ -136,7 +92,7 @@ class Manager
     /**
      * @return string
      */
-    public function getLatestVersion()
+    public function getCurrentVersion()
     {
         $file = $this->path . '/config/migration.php';
 
@@ -148,6 +104,53 @@ class Manager
         preg_match($pattern, $config, $matches);
 
         return $matches ? $matches[1] : '';
+    }
+
+    /**
+     * @return string
+     */
+    public function getLastVersion()
+    {
+        $items = $this->getMigrations();
+
+        $current = $this->getCurrentVersion();
+
+        $parsed = null;
+
+        foreach ($items as $index => $item)
+        {
+            if (strtotime($item['version']) !== strtotime($current))
+            {
+                continue;
+            }
+
+            if (array_key_exists($index - 1, $items))
+            {
+                $parsed = $items[$index - 1];
+
+                break;
+            }
+        }
+
+        return $parsed ? $parsed['version'] : '0';
+    }
+
+    /**
+     * @return string
+     */
+    public function getLatestVersion()
+    {
+        /** @var array<string, string> */
+        $items = $this->ci->migration->find_migrations();
+
+        if (count($items) === 0)
+        {
+            return '0';
+        }
+
+        $keys = array_keys($items);
+
+        return $keys[count($keys) - 1];
     }
 
     /**

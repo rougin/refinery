@@ -44,6 +44,24 @@ class ManagerTest extends Testcase
     /**
      * @return void
      */
+    public function test_empty_migrations()
+    {
+        $test = $this->findCommand('migrate');
+
+        $test->execute(array());
+
+        $expected = '[PASS] Nothing to migrate.';
+
+        $actual = $this->getActualDisplay($test);
+
+        $this->assertEquals($expected, $actual);
+    }
+
+    /**
+     * @depends test_empty_migrations
+     *
+     * @return void
+     */
     public function test_migrating_files()
     {
         $this->useMysqlConfig();
@@ -56,7 +74,9 @@ class ManagerTest extends Testcase
         $input = array('name' => 'create_users_table');
         $test->execute($input);
 
-        sleep(5);
+        $date = date('YmdHis');
+
+        sleep(1);
 
         $input = array('name' => 'add_name_in_users_table');
         $input['--length'] = 100;
@@ -64,11 +84,29 @@ class ManagerTest extends Testcase
         $test->execute($input);
         // -------------------------------------------------
 
-        // Perform the migration of the files ---
+        // Perform the migration of the first file ---
+        $test = $this->findCommand('migrate');
+
+        $test->execute(array('--target' => $date));
+        // -------------------------------------------
+
+        $expected = 1;
+
+        $actual = $this->describe->columns('users');
+
+        $this->assertCount($expected, $actual);
+    }
+
+    /**
+     * @depends test_migrating_files
+     *
+     * @return void
+     */
+    public function test_migrating_next_file()
+    {
         $test = $this->findCommand('migrate');
 
         $test->execute(array());
-        // --------------------------------------
 
         $expected = 2;
 
@@ -78,7 +116,7 @@ class ManagerTest extends Testcase
     }
 
     /**
-     * @depends test_migrating_files
+     * @depends test_migrating_next_file
      *
      * @return void
      */
@@ -93,6 +131,40 @@ class ManagerTest extends Testcase
         $actual = $this->getActualDisplay($test);
 
         $this->assertEquals($expected, $actual);
+    }
+
+    /**
+     * @depends test_reset_to_0
+     *
+     * @return void
+     */
+    public function test_nothing_to_rollback()
+    {
+        $test = $this->findCommand('rollback');
+
+        $test->execute(array());
+
+        $expected = '[PASS] Nothing to roll back.';
+
+        $actual = $this->getActualDisplay($test);
+
+        $this->assertEquals($expected, $actual);
+    }
+
+    /**
+     * @depends test_rolling_back
+     *
+     * @return void
+     */
+    public function test_reset_to_0()
+    {
+        $this->expectException('Exception');
+
+        $test = $this->findCommand('reset');
+
+        $test->execute(array());
+
+        $this->describe->columns('users');
     }
 
     /**

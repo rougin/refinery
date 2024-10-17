@@ -50,7 +50,7 @@ class Migrator extends Command
      */
     public function init()
     {
-        $this->addOptionalArgument('version', 'Version number of the migration file');
+        $this->addRequiredOption('target', 'The version number to migrate to', null, '-t');
     }
 
     /**
@@ -70,38 +70,65 @@ class Migrator extends Command
      */
     public function run()
     {
-        $latest = $this->manager->getLatestVersion();
+        $migrate = $this->type === self::TYPE_MIGRATE;
 
-        $files = $this->manager->getMigrations();
+        $rollback = $this->type === self::TYPE_ROLLBACK;
 
-        $toMigrate = $this->type === self::TYPE_MIGRATE;
+        /** @var string|null */
+        $target = $this->getOption('target');
 
-        if (! $toMigrate)
+        if ($target === null)
         {
-            $last = $this->manager->getLastMigration($latest);
+            $target = $this->manager->getLastVersion();
 
-            $files = $latest === '0' ? array() : array($last);
+            if ($migrate)
+            {
+                $target = $this->manager->getLatestVersion();
+            }
         }
 
-        $current = null;
+        $current = $this->manager->getCurrentVersion();
 
-        foreach ($files as $item)
+        $items = $this->manager->getMigrations($rollback);
+
+        if ($current === $target)
         {
-            $before = 'Rolling back';
+            $items = array();
+        }
 
-            $after = 'rolled back';
+        $latest = null;
+
+        foreach ($items as $item)
+        {
+            $before = $migrate ? 'Migrating' : 'Rolling back';
+
+            $after = $migrate ? 'migrated' : 'rolled back';
 
             $version = $item['version'];
 
             $file = $item['file'];
 
-            if ($toMigrate)
+            if ($migrate)
             {
-                $before = 'Migrating';
+                if (strtotime($version) <= strtotime($current))
+                {
+                    continue;
+                }
 
-                $after = 'migrated';
+                if (strtotime($version) > strtotime($target))
+                {
+                    continue;
+                }
+            }
 
-                if (strtotime($version) <= strtotime($latest))
+            if ($rollback)
+            {
+                if (strtotime($version) >= strtotime($current))
+                {
+                    continue;
+                }
+
+                if (strtotime($version) < strtotime($target))
                 {
                     continue;
                 }
@@ -115,16 +142,16 @@ class Migrator extends Command
 
             $this->showPass('"' . $name . '" ' . $after . '!');
 
-            $current = $version;
+            $latest = $version;
         }
 
-        if ($current !== null)
+        if ($latest !== null)
         {
-            $this->manager->saveLatest($current);
+            $this->manager->saveLatest($latest);
         }
         else
         {
-            $text = $toMigrate ? 'migrate' : 'roll back';
+            $text = $migrate ? 'migrate' : 'roll back';
 
             $this->showPass('Nothing to ' . $text . '.');
         }
