@@ -6,39 +6,65 @@
 [![Coverage Status][ico-coverage]][link-coverage]
 [![Total Downloads][ico-downloads]][link-downloads]
 
-Refinery is an extension and a command line interface of [Migrations Class](https://www.codeigniter.com/user_guide/libraries/migration.html) for the [Codeigniter](https://codeigniter.com/) framework. It uses the [Describe](https://roug.in/describe/) library for retrieving the database tables and as the basis for code generation.
+`Refinery` is a console-based package of [Migrations Class](https://www.codeigniter.com/userguide3/libraries/migration.html) for the [Codeigniter 3](https://codeigniter.com/userguide3). It uses the [Describe](https://roug.in/describe/) package for retrieving the database tables and as the basis for code generation.
 
 ## Installation
 
-Install `Refinery` through [Composer](https://getcomposer.org/):
+From an existing `Codeigniter 3` project, the `Refinery` package can be installed through [Composer](https://getcomposer.org/):
 
 ``` bash
-$ composer require rougin/refinery
+$ composer require rougin/refinery --dev
+```
+
+``` json
+// acme/composer.json
+
+{
+  // ...
+
+  "require-dev":
+  {
+    "mikey179/vfsstream": "1.6.*",
+    "phpunit/phpunit": "4.* || 5.* || 9.*",
+    "rougin/refinery": "~0.4"
+  }
+}
 ```
 
 ## Basic Usage
 
-### Creating a table
+To create a new database migration, kindly run the `create` command:
 
 ``` bash
 $ vendor/bin/refinery create create_users_table
-"20180621090905_create_users_table.php" has been created.
+[PASS] "20241017173347_create_users_table.php" successfully created!
 ```
 
 ``` php
-// application/migrations/20180621090905_create_users_table.php
+// application/migrations/20241017173347_create_users_table.php
 
-defined('BASEPATH') OR exit('No direct script access allowed');
+use Rougin\Refinery\Migration;
 
-class Migration_create_users_table extends CI_Migration
+class Migration_create_users_table extends Migration
 {
+    /**
+     * @return void
+     */
     public function up()
     {
-        $this->dbforge->add_field('id');
+        $data = array('id' => array());
+        $data['id']['type'] = 'integer';
+        $data['id']['auto_increment'] = true;
+        $data['id']['constraint'] = 10;
+        $this->dbforge->add_field($data);
+        $this->dbforge->add_key('id', true);
 
         $this->dbforge->create_table('users');
     }
 
+    /**
+     * @return void
+     */
     public function down()
     {
         $this->dbforge->drop_table('users');
@@ -46,7 +72,10 @@ class Migration_create_users_table extends CI_Migration
 }
 ```
 
-Use `--from-database` option to create a migration from an existing database table.
+> [!NOTE]
+> The `Migration` class under `Refinery` is directly based on `CI_Migration`. The only difference is the said class provides improved code documentation for the `dbforge` utility.
+
+To create a database migration from an existing database table, run the same `create` command with the `--from-database` option:
 
 ``` sql
 CREATE TABLE IF NOT EXISTS `user` (
@@ -126,7 +155,7 @@ class Migration_create_users_table extends CI_Migration
 }
 ```
 
-### Creating a column inside a table
+The `Refinery` package will try to guess the expected output of `up` and `down` methods of a migration file based on its provided name (e.g., `add_name_in_users_table`):
 
 ```bash
 $ vendor/bin/refinery create add_name_in_users_table
@@ -161,7 +190,7 @@ class Migration_add_name_in_users_table extends CI_Migration
 }
 ```
 
-#### Available keywords
+### Available keywords
 
 | Command | Description |
 | ------- | ----------- |
@@ -186,10 +215,10 @@ Rolling back: 20180621090953_add_name_in_users_table
 Rolled back:  20180621090953_add_name_in_users_table
 ```
 
-**NOTE**: You can also specify the version you want to rollback on using the `--version` option. (e.g: `--version=20180621090905`)
+**NOTE**: You can also specify the version you want to rollback on using the `--target` option. (e.g: `--target=20180621090905`)
 
 ```bash
-$ vendor/bin/refinery rollback 20180621090905
+$ vendor/bin/refinery rollback --target 20180621090905
 Rolling back: 20180621090905_create_users_table
 Rolled back:  20180621090905_create_users_table
 ```

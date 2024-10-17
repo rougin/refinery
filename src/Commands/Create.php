@@ -95,7 +95,7 @@ class Create extends Command
 
         $result = $maker->make($class->init());
 
-        $this->createFile($name, $result);
+        $name = $this->createFile($name, $result);
 
         $this->showPass('"' . $name . '" successfully created!');
 
@@ -126,6 +126,8 @@ class Create extends Command
         $file = $path . $prefix . '_' . $name;
 
         file_put_contents($file . '.php', $class);
+
+        return $prefix . '_' . $name . '.php';
     }
 
     /**
