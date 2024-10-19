@@ -242,7 +242,7 @@ class Migration_create_users_table extends Migration
 
 ### Creating sequential migrations
 
-By default, this uses a timestamp prefix as its numbering when creating migration files. To enable sequential numbering, kindly add the `--sequential` option in the `create` command:
+By default, this package uses a timestamp prefix as its numbering style when creating migration files. To change it to a sequential numbering instead, kindly add the `--sequential` option in the `create` command:
 
 ``` bash
 $ vendor/bin/refinery create create_users_table --sequential
