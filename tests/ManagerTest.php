@@ -158,7 +158,7 @@ class ManagerTest extends Testcase
      */
     public function test_05_reset_to_0()
     {
-        $this->expectException('Exception');
+        $this->setExpectedException('Exception');
 
         $test = $this->findCommand('reset');
 
@@ -199,6 +199,7 @@ class ManagerTest extends Testcase
 
         // Then clear the said files ---
         $this->clearFiles();
+        $this->useMysqlConfig();
         // -----------------------------
 
         // Create a new migration based on database ---
