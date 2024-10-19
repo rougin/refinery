@@ -29,8 +29,6 @@ class Manager
     {
         $this->ci = $ci;
 
-        $this->ci->load->library('migration');
-
         $this->path = $path;
     }
 
@@ -41,6 +39,8 @@ class Manager
      */
     public function getMigrations($reverse = false)
     {
+        $this->ci->load->library('migration');
+
         /** @var array<string, string> */
         $items = $this->ci->migration->find_migrations();
 
@@ -140,6 +140,8 @@ class Manager
      */
     public function getLatestVersion()
     {
+        $this->ci->load->library('migration');
+
         /** @var array<string, string> */
         $items = $this->ci->migration->find_migrations();
 
