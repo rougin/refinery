@@ -15,7 +15,7 @@ All notable changes to `Refinery` will be documented in this file.
 - Code coverage provider to `Codecov`
 - Code documentation by `php-cs-fixer`
 - Improved code quality by `phpstan`
-- Simplified code structure
+- Reworked entire code structure
 - Workflow provider to `Github Actions`
 
 ### Removed

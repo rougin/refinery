@@ -52,7 +52,7 @@ $ vendor/bin/refinery create create_users_table
 ```
 
 ``` php
-// acme/application/migrations/20241019044009_create_users_table.php
+// ciacme/application/migrations/20241019044009_create_users_table.php
 
 use Rougin\Refinery\Migration;
 
@@ -94,7 +94,7 @@ $ vendor/bin/refinery create add_name_in_users_table
 ```
 
 ``` php
-// acme/application/migrations/20241019044035_add_name_in_users_table.php
+// ciacme/application/migrations/20241019044035_add_name_in_users_table.php
 
 use Rougin\Refinery\Migration;
 
@@ -179,7 +179,7 @@ $ vendor/bin/refinery reset
 
 ### Creating from database
 
-This package also allows to create a database migration based on the existing database table. Prior to create the specified command, kindly ensure that the specified table already exists in the database schema:
+This package also allows to create a database migration based on the existing database table. Prior in creating its database migration, kindly ensure that the specified table already exists in the database schema:
 
 ``` sql
 CREATE TABLE IF NOT EXISTS `users` (
@@ -197,7 +197,7 @@ $ vendor/bin/refinery create create_users_table --from-database
 ```
 
 ``` php
-// acme/application/migrations/20241019044729_create_users_table.php
+// ciacme/application/migrations/20241019044729_create_users_table.php
 
 use Rougin\Refinery\Migration;
 
