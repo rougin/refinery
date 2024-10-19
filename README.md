@@ -51,7 +51,7 @@ $db['default'] = array(
 ```
 
 > [!NOTE]
-> Although using database connection is not required in using `Refinery`, this is only applicable when creating migration files based on an existing database. Please see `Creating from database` below for its usage.
+> Although using database connection is not required in using `Refinery`, this is only applicable when creating migration files based on an existing database. Please see [Creating from database](https://github.com/rougin/refinery?tab=readme-ov-file#creating-from-database) below for its usage.
 
 ## Basic Usage
 
