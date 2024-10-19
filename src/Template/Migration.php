@@ -167,13 +167,8 @@ class Migration extends Classidy
 
         return function ($lines) use ($columns, $table)
         {
-            foreach ($columns as $index => $column)
+            foreach ($columns as $column)
             {
-                if ($index !== 0)
-                {
-                    $lines[] = '';
-                }
-
                 $lines = $this->parseColumn($lines, $table, $column);
             }
 
