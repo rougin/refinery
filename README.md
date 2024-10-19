@@ -238,7 +238,7 @@ class Migration_create_users_table extends Migration
 ```
 
 > [!NOTE]
-> The `--from-database` only exists when specifying the `create_*_table` prefix.
+> The `--from-database` option only exists when creating files under the `create_*_table` prefix.
 
 ## Changelog
 
