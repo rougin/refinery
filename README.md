@@ -31,9 +31,7 @@ $ composer require rougin/refinery --dev
 }
 ```
 
-## Basic Usage
-
-Prior in running any of the commands from this package, kindly ensure that the `migrations` directory exists first:
+Next is to ensure that the `migrations` directory also exists:
 
 ```
 ciacme/
@@ -42,7 +40,7 @@ ciacme/
 ├─ system/
 ```
 
-When using a database schema for creating migration files, kindly configure the project's database connectivity settings as well:
+Then configure the project's database connectivity settings:
 
 ``` php
 // ciacme/application/config/database.php
@@ -60,6 +58,11 @@ $db['default'] = array(
     // ...
 );
 ```
+
+> [!NOTE]
+> Although using database connection is not required in using `Refinery`, this is only applicable when creating migration files based on an existing database.
+
+## Basic Usage
 
 ### Creating migration files
 
@@ -105,7 +108,7 @@ class Migration_create_users_table extends Migration
 > [!NOTE]
 > The `Migration` class under `Refinery` is directly based on `CI_Migration`. The only difference is the said class provides improved code documentation for the `dbforge` utility.
 
-This package will try to guess the expected output of `up` and `down` methods of a migration file based on its name (e.g., `add_name_in_users_table`):
+`Refinery` will try to guess the expected output of `up` and `down` methods of a migration file based on its name (e.g., `add_name_in_users_table`):
 
 ```bash
 $ vendor/bin/refinery create add_name_in_users_table
@@ -196,9 +199,9 @@ $ vendor/bin/refinery reset
 [PASS] "create_users_table" rolled back!
 ```
 
-### Creating from database
+## Creating from database
 
-This package also allows to create a database migration based on the existing database table. Prior in creating its database migration, kindly ensure that the specified table already exists in the database schema:
+`Refinery` also allows to create a database migration based on the existing database table. Prior in creating its database migration, kindly ensure that the specified table already exists in the database schema:
 
 ``` sql
 CREATE TABLE IF NOT EXISTS `users` (
@@ -259,7 +262,7 @@ class Migration_create_users_table extends Migration
 > [!NOTE]
 > The `--from-database` option only exists when creating files under the `create_*_table` prefix.
 
-### Creating sequential migrations
+## Creating sequential migrations
 
 By default, this package uses a timestamp prefix as its numbering style when creating migration files. To change it to a sequential numbering instead, kindly add the `--sequential` option in the `create` command:
 
@@ -291,6 +294,41 @@ When using the `--sequential` option, kindly ensure as well that the value of `$
 */
 $config['migration_type'] = 'sequential';
 ```
+
+## Using `refinery.yml`
+
+`Refinery` currently works out of the box after the configuration based on `Installation`. However, using a `refinery.yml` can be used for complex setups like specifying the new application path:
+
+``` yaml
+# refinery.yml
+
+app_path: %%CURRENT_DIRECTORY%%
+```
+
+To create a `refinery.yml`, simply run the `initialize` command:
+
+``` bash
+$ vendor/bin/refinery initialize
+[PASS] "refinery.yml" added successfully!
+```
+
+> [!NOTE]
+> `%%CURRENT_DIRECTORY%%` is a placeholder variable which is the current directory of `refinery.yml`.
+
+### `app_path`
+
+This property specifies the `application` directory. It may updated to any directory (e.g., `ciacme/application`, `ciacme/config`, etc.) as long it can detect the `config/config.php` file from the defined directory:
+
+``` yaml
+# refinery.yml
+
+app_path: %%CURRENT_DIRECTORY%%/Sample
+
+# ...
+```
+
+> [!NOTE]
+> `Refinery` will try to check the path specified in `app_path` if it is a valid `Codeigniter 3` project. Then it will perform another check if the `application` directory exists or if the `config` directory can be accessed directly from the directory defined in `app_path`.
 
 ## Changelog
 
