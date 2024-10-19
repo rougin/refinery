@@ -240,6 +240,39 @@ class Migration_create_users_table extends Migration
 > [!NOTE]
 > The `--from-database` option only exists when creating files under the `create_*_table` prefix.
 
+### Creating sequential migrations
+
+By default, this uses a timestamp prefix as its numbering when creating migration files. To enable sequential numbering, kindly add the `--sequential` option in the `create` command:
+
+``` bash
+$ vendor/bin/refinery create create_users_table --sequential
+[PASS] "001_create_users_table.php" successfully created!
+```
+
+When using the `--sequential` option, kindly ensure as well that the value of `$config['migration_type']` in `migration.php` was set to `sequential`:
+
+``` php
+// ciacme/application/config/migration.php
+
+/*
+|--------------------------------------------------------------------------
+| Migration Type
+|--------------------------------------------------------------------------
+|
+| Migration file names may be based on a sequential identifier or on
+| a timestamp. Options are:
+|
+|   'sequential' = Sequential migration naming (001_add_blog.php)
+|   'timestamp'  = Timestamp migration naming (20121031104401_add_blog.php)
+|                  Use timestamp format YYYYMMDDHHIISS.
+|
+| Note: If this configuration value is missing the Migration library
+|       defaults to 'sequential' for backward compatibility with CI2.
+|
+*/
+$config['migration_type'] = 'sequential';
+```
+
 ## Changelog
 
 Please see [CHANGELOG][link-changelog] for more information what has changed recently.

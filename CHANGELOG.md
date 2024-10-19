@@ -18,9 +18,6 @@ All notable changes to `Refinery` will be documented in this file.
 - Reworked entire code structure
 - Workflow provider to `Github Actions`
 
-### Removed
-- `sequential` option in `create` command
-
 ## [0.3.0](https://github.com/rougin/refinery/compare/v0.2.1...v0.3.0) - 2017-01-07
 
 ### Added

@@ -58,6 +58,7 @@ class Create extends Command
         $this->addValueOption('auto-increment', 'Sets the "auto_increment" value', false);
         $this->addValueOption('default', 'Sets the "default" value of the column');
         $this->addOption('from-database', 'Creates a migration from the database');
+        $this->addOption('sequential', 'Use a sequential identifier (e.g., 001, 002)');
         $this->addValueOption('length', 'Sets the "constraint" value of the column', 50);
         $this->addValueOption('null', 'Sets the column with a nullable value', false);
         $this->addValueOption('primary', 'Sets the column as the primary key', false);
@@ -135,13 +136,14 @@ class Create extends Command
 
         $style = $this->getNumberStyle();
 
-        // TODO: Get latest sequence from config ---
-        $prefix = null;
-        // -----------------------------------------
+        $prefix = date('YmdHis');
 
-        if ($style === Migration::STYLE_TIMESTAMP)
+        if ($style === Migration::STYLE_SEQUENCE)
         {
-            $prefix = date('YmdHis');
+            /** @var string[] */
+            $files = glob($path . '*.php');
+
+            $prefix = sprintf('%03d', count($files) + 1);
         }
 
         $file = $path . $prefix . '_' . $name;
@@ -178,11 +180,14 @@ class Create extends Command
     {
         $type = $this->getConfig('migration_type');
 
-        $style = Migration::STYLE_SEQUENCE;
+        $style = Migration::STYLE_TIMESTAMP;
 
-        if ($type === '\'timestamp\'')
+        /** @var boolean */
+        $sequential = $this->getOption('sequential');
+
+        if ($sequential || $type === '\'sequential\'')
         {
-            $style = Migration::STYLE_TIMESTAMP;
+            $style = Migration::STYLE_SEQUENCE;
         }
 
         return $style;

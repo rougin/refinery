@@ -219,6 +219,8 @@ class ManagerTest extends Testcase
 
         $actual = $this->getActualFile($input['name']);
 
+        $this->clearFiles();
+
         $this->assertEquals($expected, $actual);
     }
 

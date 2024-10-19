@@ -34,6 +34,7 @@ class PlateTest extends Testcase
         $test = $this->findCommand('create');
 
         $input = array('name' => 'add_name_in_users_table');
+        $input['--sequential'] = true;
         $input['--length'] = 100;
         $input['--null'] = true;
 
@@ -56,6 +57,7 @@ class PlateTest extends Testcase
         $test = $this->findCommand('create');
 
         $input = array('name' => 'create_users_table');
+        $input['--sequential'] = true;
 
         $test->execute($input);
 
@@ -78,6 +80,7 @@ class PlateTest extends Testcase
         $test = $this->findCommand('create');
 
         $input = array('name' => 'remove_name_in_users_table');
+        $input['--sequential'] = true;
         $input['--length'] = 100;
         $input['--null'] = true;
 
@@ -100,6 +103,7 @@ class PlateTest extends Testcase
         $test = $this->findCommand('create');
 
         $input = array('name' => 'delete_users_table');
+        $input['--sequential'] = true;
 
         $test->execute($input);
 
@@ -122,10 +126,7 @@ class PlateTest extends Testcase
         /** @var string[] */
         $files = glob($path . '/migrations/*.php');
 
-        foreach ($files as $file)
-        {
-            unlink($file);
-        }
+        array_map('unlink', $files);
     }
 
     /**
@@ -171,7 +172,7 @@ class PlateTest extends Testcase
         {
             $base = basename($file);
 
-            $parsed = substr($base, 15, strlen($base));
+            $parsed = substr($base, 4, strlen($base));
 
             if ($parsed === $name . '.php')
             {
