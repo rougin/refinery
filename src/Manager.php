@@ -169,7 +169,7 @@ class Manager
      */
     protected function startMigration()
     {
-        $this->setConfig('migration_enabled', 'true');
+        $this->setConfig('migration_enabled', 'TRUE');
     }
 
     /**
@@ -177,7 +177,7 @@ class Manager
      */
     protected function stopMigration()
     {
-        $this->setConfig('migration_enabled', 'false');
+        $this->setConfig('migration_enabled', 'FALSE');
     }
 
     /**
