@@ -39,10 +39,14 @@ class Manager
      */
     public function getMigrations($reverse = false)
     {
+        $this->startMigration();
+
         $this->ci->load->library('migration');
 
         /** @var array<string, string> */
         $items = $this->ci->migration->find_migrations();
+
+        $this->stopMigration();
 
         if ($reverse)
         {
@@ -140,19 +144,14 @@ class Manager
      */
     public function getLatestVersion()
     {
-        $this->ci->load->library('migration');
-
-        /** @var array<string, string> */
-        $items = $this->ci->migration->find_migrations();
+        $items = $this->getMigrations();
 
         if (count($items) === 0)
         {
             return '0';
         }
 
-        $keys = array_keys($items);
-
-        return $keys[count($keys) - 1];
+        return $items[count($items) - 1]['version'];
     }
 
     /**
@@ -162,18 +161,7 @@ class Manager
      */
     public function saveLatest($version)
     {
-        $file = $this->path . '/config/migration.php';
-
-        $replace = '$config[\'migration_version\'] = ' . $version . ';';
-
-        /** @var string */
-        $config = file_get_contents($file);
-
-        $pattern = '/\$config\[\\\'migration_version\\\'\] = (.*?);/i';
-
-        $result = preg_replace($pattern, $replace, $config);
-
-        file_put_contents($file, $result);
+        $this->setConfig('migration_version', $version);
     }
 
     /**
@@ -181,7 +169,7 @@ class Manager
      */
     protected function startMigration()
     {
-        $this->ci->config->set_item('migration_enabled', 'true');
+        $this->setConfig('migration_enabled', 'TRUE');
     }
 
     /**
@@ -189,6 +177,28 @@ class Manager
      */
     protected function stopMigration()
     {
-        $this->ci->config->set_item('migration_enabled', 'false');
+        $this->setConfig('migration_enabled', 'FALSE');
+    }
+
+    /**
+     * @param string $key
+     * @param string $value
+     *
+     * @return void
+     */
+    protected function setConfig($key, $value)
+    {
+        $file = $this->path . '/config/migration.php';
+
+        /** @var string */
+        $config = file_get_contents($file);
+
+        $text = '$config[\'' . $key . '\'] = ' . $value . ';';
+
+        $pattern = '/\$config\[\\\'' . $key . '\\\'\] = (.*?);/i';
+
+        $result = preg_replace($pattern, $text, $config);
+
+        file_put_contents($file, $result);
     }
 }

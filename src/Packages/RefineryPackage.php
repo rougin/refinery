@@ -47,7 +47,9 @@ class RefineryPackage implements IntegrationInterface
 
             $app->setApp($class);
 
-            $manager = new Manager($class, $this->root);
+            $path = $app->getAppPath();
+
+            $manager = new Manager($class, $path);
 
             $app->setManager($manager);
         }

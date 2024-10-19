@@ -12,7 +12,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
 | and disable it back when you're done.
 |
 */
-$config['migration_enabled'] = true;
+$config['migration_enabled'] = FALSE;
 
 /*
 |--------------------------------------------------------------------------

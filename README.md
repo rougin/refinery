@@ -31,15 +31,6 @@ $ composer require rougin/refinery --dev
 }
 ```
 
-Next is to ensure that the `migrations` directory also exists:
-
-```
-ciacme/
-├─ application/
-│  ├─ migrations/
-├─ system/
-```
-
 Then configure the project's database connectivity settings:
 
 ``` php
@@ -106,7 +97,8 @@ class Migration_create_users_table extends Migration
 ```
 
 > [!NOTE]
-> The `Migration` class under `Refinery` is directly based on `CI_Migration`. The only difference is the said class provides improved code documentation for the `dbforge` utility.
+> * The `Migration` class under `Refinery` is directly extended on `CI_Migration`.
+> * The created file will be in `migrations` directory under `application`. If it does not exists, `Refinery` will automatically create the specified directory.
 
 `Refinery` will try to guess the expected output of `up` and `down` methods of a migration file based on its name (e.g., `add_name_in_users_table`):
 

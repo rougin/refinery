@@ -134,6 +134,11 @@ class Create extends Command
     {
         $path = $this->path . '/migrations/';
 
+        if (! is_dir($path))
+        {
+            mkdir($path);
+        }
+
         $style = $this->getNumberStyle();
 
         $prefix = date('YmdHis');
