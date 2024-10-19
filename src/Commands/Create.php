@@ -80,6 +80,13 @@ class Create extends Command
 
         $parser = new Parser($name);
 
+        if ($useDb && ! $parser->isCreateTable())
+        {
+            $this->showFail('The option "--from-database" is only applicable to "create" prefix.');
+
+            return self::RETURN_FAILURE;
+        }
+
         $class = new Migration($name);
 
         $class->setParser($parser);

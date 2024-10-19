@@ -211,13 +211,33 @@ class ManagerTest extends Testcase
         // --------------------------------------------
 
         // Clean database by rolling back to version 0 ---
-        $test = $this->findCommand('rollback');
-        $test->execute(array('--target' => '0'));
+        $test = $this->findCommand('reset');
+        $test->execute(array());
         // -----------------------------------------------
 
         $expected = $this->getTemplate('WithDatabase');
 
         $actual = $this->getActualFile($input['name']);
+
+        $this->assertEquals($expected, $actual);
+    }
+
+    /**
+     * @depends test_07_create_with_database
+     *
+     * @return void
+     */
+    public function test_08_create_with_database_on_invalid_prefix()
+    {
+        $test = $this->findCommand('create');
+
+        $input = array('name' => 'add_name_in_users_table');
+        $input['--from-database'] = true;
+        $test->execute($input);
+
+        $expected = '[FAIL] The option "--from-database" is only applicable to "create" prefix.';
+
+        $actual = $this->getActualDisplay($test);
 
         $this->assertEquals($expected, $actual);
     }

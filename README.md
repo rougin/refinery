@@ -17,7 +17,7 @@ $ composer require rougin/refinery --dev
 ```
 
 ``` json
-// acme/composer.json
+// ciacme/composer.json
 
 {
   // ...
@@ -33,15 +33,26 @@ $ composer require rougin/refinery --dev
 
 ## Basic Usage
 
+Prior in running any of the commands from this package, kindly ensure that the `migrations` directory exists first:
+
+```
+ciacme/
+├─ application/
+│  ├─ migrations/
+├─ system/
+```
+
+### Creating migration files
+
 To create a new database migration, kindly run the `create` command:
 
 ``` bash
 $ vendor/bin/refinery create create_users_table
-[PASS] "20241017173347_create_users_table.php" successfully created!
+[PASS] "20241019044009_create_users_table.php" successfully created!
 ```
 
 ``` php
-// acme/application/migrations/20241017173347_create_users_table.php
+// acme/application/migrations/20241019044009_create_users_table.php
 
 use Rougin\Refinery\Migration;
 
@@ -75,114 +86,38 @@ class Migration_create_users_table extends Migration
 > [!NOTE]
 > The `Migration` class under `Refinery` is directly based on `CI_Migration`. The only difference is the said class provides improved code documentation for the `dbforge` utility.
 
-To create a database migration from an existing database table, run the same `create` command with the `--from-database` option:
-
-``` sql
-CREATE TABLE IF NOT EXISTS `user` (
-    `id` int(10) NOT NULL AUTO_INCREMENT,
-    `name` varchar(200) NOT NULL,
-    `age` int(2) NOT NULL,
-    `gender` varchar(10) NOT NULL,
-    PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1;
-```
-
-``` bash
-$ vendor/bin/refinery create create_users_table --from-database
-"20180621090905_create_users_table.php" has been created.
-```
-
-``` php
-// acme/application/migrations/20180621090905_create_users_table.php
-
-defined('BASEPATH') OR exit('No direct script access allowed');
-
-class Migration_create_users_table extends CI_Migration
-{
-    public function up()
-    {
-        $this->dbforge->add_column('users', array(
-            'gender' => array(
-                'type' => 'string',
-                'constraint' => 10,
-                'auto_increment' => FALSE,
-                'default' => '',
-                'null' => FALSE,
-                'unsigned' => FALSE
-            ),
-        ));
-
-        $this->dbforge->add_column('users', array(
-            'age' => array(
-                'type' => 'integer',
-                'constraint' => 2,
-                'auto_increment' => FALSE,
-                'default' => '',
-                'null' => FALSE,
-                'unsigned' => FALSE
-            ),
-        ));
-
-        $this->dbforge->add_column('users', array(
-            'name' => array(
-                'type' => 'string',
-                'constraint' => 200,
-                'auto_increment' => FALSE,
-                'default' => '',
-                'null' => FALSE,
-                'unsigned' => FALSE
-            ),
-        ));
-
-        $this->dbforge->add_column('users', array(
-            'id' => array(
-                'type' => 'integer',
-                'constraint' => 10,
-                'auto_increment' => TRUE,
-                'default' => '',
-                'null' => FALSE,
-                'unsigned' => FALSE
-            ),
-        ));
-
-        $this->dbforge->create_table('users');
-    }
-
-    public function down()
-    {
-        $this->dbforge->drop_table('users');
-    }
-}
-```
-
-The `Refinery` package will try to guess the expected output of `up` and `down` methods of a migration file based on its provided name (e.g., `add_name_in_users_table`):
+This package will try to guess the expected output of `up` and `down` methods of a migration file based on its name (e.g., `add_name_in_users_table`):
 
 ```bash
 $ vendor/bin/refinery create add_name_in_users_table
-"20180621090953_add_name_in_users_table.php" has been created.
+"20241019044035_add_name_in_users_table.php" has been created.
 ```
 
 ``` php
-// acme/application/migrations/20180621090953_add_name_in_users_table.php
+// acme/application/migrations/20241019044035_add_name_in_users_table.php
 
-defined('BASEPATH') OR exit('No direct script access allowed');
+use Rougin\Refinery\Migration;
 
-class Migration_add_name_in_users_table extends CI_Migration
+class Migration_add_name_in_users_table extends Migration
 {
+    /**
+     * @return void
+     */
     public function up()
     {
-        $this->dbforge->add_column('users', array(
-            'name' => array(
-                'type' => 'VARCHAR',
-                'constraint' => 50,
-                'auto_increment' => FALSE,
-                'default' => '',
-                'null' => FALSE,
-                'unsigned' => FALSE
-            ),
-        ));
+        $data = array('name' => array());
+        $data['name']['type'] = 'varchar';
+        $data['name']['auto_increment'] = false;
+        $data['name']['constraint'] = 100;
+        $data['name']['default'] = null;
+        $data['name']['null'] = true;
+        $data['name']['unsigned'] = false;
+        $this->dbforge->add_column('users', $data);
     }
 
+    /**
+     * @return void
+     */
     public function down()
     {
         $this->dbforge->drop_column('users', 'name');
@@ -190,46 +125,120 @@ class Migration_add_name_in_users_table extends CI_Migration
 }
 ```
 
-### Available keywords
+Please see the accepted keywords below when creating database migration files:
 
-| Command | Description |
-| ------- | ----------- |
-| `create` | creates new table (`create_users_table`) |
-| `add` | adds new column for a specific table (`add_username_in_users_table`) |
-| `delete` | deletes specified column from table (`delete_created_at_in_users_table`) |
-| `modify` | updates the specified column from table (`modify_name_in_users_table`) |
+| Keyword  | Description                                    | Example                      |
+|----------|------------------------------------------------|------------------------------|
+| `add`    | Adds new column to a table                     | `add_name_in_users_table`    |
+| `create` | Creates new table with `id` as the primary key | `create_users_table`         |
+| `delete` | Deletes a column from a table                  | `delete_name_in_users_table` |
+| `modify` | Updates a column of a table                    | `modify_name_in_users_table` |
 
-### Migrate, rollback and reset
+### Running the migrations
 
-```bash
+Kindly use the `migrate` command to use the files for database migrations:
+
+``` bash
 $ vendor/bin/refinery migrate
-Migrating: 20180621090905_create_users_table
-Migrated:  20180621090905_create_users_table
-Migrating: 20180621090953_add_name_in_users_table
-Migrated:  20180621090953_add_name_in_users_table
+[INFO] Migrating "create_users_table"...
+[PASS] "create_users_table" migrated!
+[INFO] Migrating "add_name_in_users_table"...
+[PASS] "add_name_in_users_table" migrated!
 ```
 
-```bash
+When running this command, the target timestamp (`--target`) will always be the latest file in the `migrations` directory if not specified (e.g., `add_name_in_users_table`). Use the `--target` option to migrate to a specific version:
+
+``` bash
+$ vendor/bin/refinery migrate --target=20241019044009
+```
+
+To rollback a database, kindly use the `rollback` command:
+
+``` bash
 $ vendor/bin/refinery rollback
-Rolling back: 20180621090953_add_name_in_users_table
-Rolled back:  20180621090953_add_name_in_users_table
+[INFO] Rolling back "add_name_in_users_table"...
+[PASS] "add_name_in_users_table" rolled back!
 ```
 
-**NOTE**: You can also specify the version you want to rollback on using the `--target` option. (e.g: `--target=20180621090905`)
+> [!NOTE]
+> Without a `--target` option, the `rollback` will only revert to its previous version (e.g., `create_users_table`).
 
-```bash
-$ vendor/bin/refinery rollback --target 20180621090905
-Rolling back: 20180621090905_create_users_table
-Rolled back:  20180621090905_create_users_table
-```
+To reset back the database schema to version `0`, the `reset` command can be used:
 
-```bash
+``` bash
+$ vendor/bin/refinery migrate
+[INFO] Migrating "add_name_in_users_table"...
+[PASS] "add_name_in_users_table" migrated!
+
 $ vendor/bin/refinery reset
-Rolling back: 20180621090953_add_name_in_users_table
-Rolled back:  20180621090953_add_name_in_users_table
-Rolling back: 20180621090905_create_users_table
-Rolled back:  20180621090905_create_users_table
+[INFO] Rolling back "add_name_in_users_table"...
+[PASS] "add_name_in_users_table" rolled back!
+[INFO] Rolling back "create_users_table"...
+[PASS] "create_users_table" rolled back!
 ```
+
+### Creating from database
+
+This package also allows to create a database migration based on the existing database table. Prior to create the specified command, kindly ensure that the specified table already exists in the database schema:
+
+``` sql
+CREATE TABLE IF NOT EXISTS `users` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `name` varchar(100) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+```
+
+After checking the database table exists, run the same `create` command with the `--from-database` option:
+
+``` bash
+$ vendor/bin/refinery create create_users_table --from-database
+"20241019044729_create_users_table.php" has been created.
+```
+
+``` php
+// acme/application/migrations/20241019044729_create_users_table.php
+
+use Rougin\Refinery\Migration;
+
+class Migration_create_users_table extends Migration
+{
+    /**
+     * @return void
+     */
+    public function up()
+    {
+        $data = array('id' => array());
+        $data['id']['type'] = 'integer';
+        $data['id']['auto_increment'] = true;
+        $data['id']['constraint'] = 10;
+        $this->dbforge->add_field($data);
+        $this->dbforge->add_key('id', true);
+
+        $data = array('name' => array());
+        $data['name']['type'] = 'varchar';
+        $data['name']['auto_increment'] = false;
+        $data['name']['constraint'] = 100;
+        $data['name']['default'] = null;
+        $data['name']['null'] = true;
+        $data['name']['unsigned'] = false;
+        $this->dbforge->add_field($data);
+
+        $this->dbforge->create_table('users');
+    }
+
+    /**
+     * @return void
+     */
+    public function down()
+    {
+        $this->dbforge->drop_table('users');
+    }
+}
+```
+
+> [!NOTE]
+> The `--from-database` only exists when specifying the `create_*_table` prefix.
 
 ## Changelog
 
