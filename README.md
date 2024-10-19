@@ -42,6 +42,25 @@ ciacme/
 ├─ system/
 ```
 
+When using a database schema for creating migration files, kindly configure the project's database connectivity settings as well:
+
+``` php
+// ciacme/application/config/database.php
+
+// ...
+
+$db['default'] = array(
+    'dsn'   => '',
+    'hostname' => 'localhost',
+    'username' => '',
+    'password' => '',
+    'database' => '',
+    'dbdriver' => 'mysqli',
+    
+    // ...
+);
+```
+
 ### Creating migration files
 
 To create a new database migration, kindly run the `create` command:
