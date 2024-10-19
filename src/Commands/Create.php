@@ -75,11 +75,23 @@ class Create extends Command
         /** @var string */
         $name = $this->getArgument('name');
 
+        /** @var boolean */
+        $useDb = $this->getOption('from-database');
+
         $parser = new Parser($name);
 
         $class = new Migration($name);
 
         $class->setParser($parser);
+
+        if ($parser->isCreateTable() && $useDb && $this->driver)
+        {
+            $table = $parser->getTable();
+
+            $columns = $this->driver->columns($table);
+
+            $class->withColumns($columns);
+        }
 
         if ($parser->isCreateColumn() || $parser->isDeleteColumn())
         {
@@ -88,7 +100,9 @@ class Create extends Command
 
             $column = $this->setColumn($column);
 
-            $class->withColumn($column);
+            $columns = array($column);
+
+            $class->withColumns($columns);
         }
 
         $maker = new Generator;

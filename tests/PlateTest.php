@@ -165,7 +165,7 @@ class PlateTest extends Testcase
         /** @var string[] */
         $files = glob($path . '/migrations/*.php');
 
-        $selected = null;
+        $selected = '';
 
         foreach ($files as $file)
         {
@@ -179,11 +179,6 @@ class PlateTest extends Testcase
 
                 break;
             }
-        }
-
-        if ($selected === null)
-        {
-            throw new \Exception('"' . $name . '" file not found');
         }
 
         /** @var string */

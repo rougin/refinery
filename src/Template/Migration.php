@@ -30,9 +30,9 @@ class Migration extends Classidy
     const TYPE_UPDATE = 'update';
 
     /**
-     * @var \Rougin\Describe\Column|null
+     * @var \Rougin\Describe\Column[]
      */
-    protected $column = null;
+    protected $columns = array();
 
     /**
      * @var \Rougin\Refinery\Parser
@@ -79,13 +79,13 @@ class Migration extends Classidy
     }
 
     /**
-     * @param \Rougin\Describe\Column $column
+     * @param \Rougin\Describe\Column[] $columns
      *
      * @return self
      */
-    public function withColumn(Column $column)
+    public function withColumns($columns)
     {
-        $this->column = $column;
+        $this->columns = $columns;
 
         return $this;
     }
@@ -103,17 +103,14 @@ class Migration extends Classidy
 
         $fn = $this->getDeleteTable($table);
 
-        if ($this->column)
+        if ($this->parser->isCreateColumn())
         {
-            if ($this->parser->isCreateColumn())
-            {
-                $fn = $this->getDeleteColumn($this->column, $table);
-            }
+            $fn = $this->getDeleteColumn($table);
+        }
 
-            if ($this->parser->isDeleteColumn())
-            {
-                $fn = $this->getCreateColumn($this->column, $table);
-            }
+        if ($this->parser->isDeleteColumn())
+        {
+            $fn = $this->getCreateColumn($table);
         }
 
         if ($this->parser->isDeleteTable())
@@ -139,17 +136,14 @@ class Migration extends Classidy
 
         $fn = $this->getCreateTable($table);
 
-        if ($this->column)
+        if ($this->parser->isCreateColumn())
         {
-            if ($this->parser->isCreateColumn())
-            {
-                $fn = $this->getCreateColumn($this->column, $table);
-            }
+            $fn = $this->getCreateColumn($table);
+        }
 
-            if ($this->parser->isDeleteColumn())
-            {
-                $fn = $this->getDeleteColumn($this->column, $table);
-            }
+        if ($this->parser->isDeleteColumn())
+        {
+            $fn = $this->getDeleteColumn($table);
         }
 
         if ($this->parser->isDeleteTable())
@@ -163,34 +157,25 @@ class Migration extends Classidy
     }
 
     /**
-     * @param \Rougin\Describe\Column $column
-     * @param string                  $table
+     * @param string $table
      *
      * @return callable
      */
-    protected function getCreateColumn(Column $column, $table)
+    protected function getCreateColumn($table)
     {
-        return function ($lines) use ($column, $table)
-        {
-            $default = $column->getDefaultValue();
-            $default = $default ? '"' . $default . '"' : 'null';
-            $increment = $column->isAutoIncrement() ? 'true' : 'false';
-            $length = $column->getLength();
-            $name = $column->getField();
-            $null = $column->isNull() ? 'true' : 'false';
-            $type = $column->getDataType();
-            $unsigned = $column->isUnsigned() ? 'true' : 'false';
+        $columns = $this->columns;
 
-            $lines[] = '$data = array(\'' . $name . '\' => array());';
-            $lines[] = '';
-            $lines[] = '$data[\'' . $name . '\'][\'type\'] = \'' . $type . '\';';
-            $lines[] = '$data[\'' . $name . '\'][\'constraint\'] = ' . $length . ';';
-            $lines[] = '$data[\'' . $name . '\'][\'auto_increment\'] = ' . $increment . ';';
-            $lines[] = '$data[\'' . $name . '\'][\'default\'] = ' . $default . ';';
-            $lines[] = '$data[\'' . $name . '\'][\'null\'] = ' . $null . ';';
-            $lines[] = '$data[\'' . $name . '\'][\'unsigned\'] = ' . $unsigned . ';';
-            $lines[] = '';
-            $lines[] = '$this->dbforge->add_column(\'' . $table . '\', $data);';
+        return function ($lines) use ($columns, $table)
+        {
+            foreach ($columns as $index => $column)
+            {
+                if ($index !== 0)
+                {
+                    $lines[] = '';
+                }
+
+                $lines = $this->parseColumn($lines, $table, $column);
+            }
 
             return $lines;
         };
@@ -203,14 +188,25 @@ class Migration extends Classidy
      */
     protected function getCreateTable($table)
     {
-        return function ($lines) use ($table)
+        $columns = $this->columns;
+
+        if (count($columns) === 0)
         {
-            $lines[] = '$data = array(\'id\' => array());';
-            $lines[] = '$data[\'id\'][\'type\'] = \'integer\';';
-            $lines[] = '$data[\'id\'][\'auto_increment\'] = true;';
-            $lines[] = '$data[\'id\'][\'constraint\'] = 10;';
-            $lines[] = '$this->dbforge->add_field($data);';
-            $lines[] = '$this->dbforge->add_key(\'id\', true);';
+            $columns[] = $this->newIdColumn();
+        }
+
+        return function ($lines) use ($columns, $table)
+        {
+            foreach ($columns as $index => $column)
+            {
+                if ($index !== 0)
+                {
+                    $lines[] = '';
+                }
+
+                $lines = $this->parseColumn($lines, $table, $column);
+            }
+
             $lines[] = '';
             $lines[] = '$this->dbforge->create_table(\'' . $table . '\');';
 
@@ -234,20 +230,89 @@ class Migration extends Classidy
     }
 
     /**
-     * @param \Rougin\Describe\Column $column
-     * @param string                  $table
+     * @param string $table
      *
      * @return callable
      */
-    protected function getDeleteColumn(Column $column, $table)
+    protected function getDeleteColumn($table)
     {
-        return function ($lines) use ($column, $table)
-        {
-            $name = $column->getField();
+        $columns = $this->columns;
 
-            $lines[] = '$this->dbforge->drop_column(\'' . $table . '\', \'' . $name . '\');';
+        return function ($lines) use ($columns, $table)
+        {
+            foreach ($columns as $column)
+            {
+                $name = $column->getField();
+
+                $lines[] = '$this->dbforge->drop_column(\'' . $table . '\', \'' . $name . '\');';
+            }
 
             return $lines;
         };
+    }
+
+    /**
+     * @return \Rougin\Describe\Column
+     */
+    protected function newIdColumn()
+    {
+        $column = new Column;
+
+        $column->setDataType('integer');
+        $column->setField('id');
+        $column->setAutoIncrement(true);
+        $column->setLength(10);
+        $column->setNull(false);
+        $column->setPrimary(true);
+
+        return $column;
+    }
+
+    /**
+     * @param string[]                $lines
+     * @param string                  $table
+     * @param \Rougin\Describe\Column $column
+     *
+     * @return string[]
+     */
+    protected function parseColumn($lines, $table, Column $column)
+    {
+        $default = $column->getDefaultValue();
+        $default = $default ? '"' . $default . '"' : 'null';
+        $increment = $column->isAutoIncrement() ? 'true' : 'false';
+        $length = $column->getLength();
+        $name = $column->getField();
+        $null = $column->isNull() ? 'true' : 'false';
+        $type = strtolower($column->getDataType());
+        $type = str_replace('string', 'varchar', $type);
+        $unsigned = $column->isUnsigned() ? 'true' : 'false';
+
+        $lines[] = '$data = array(\'' . $name . '\' => array());';
+        $lines[] = '$data[\'' . $name . '\'][\'type\'] = \'' . $type . '\';';
+        $lines[] = '$data[\'' . $name . '\'][\'auto_increment\'] = ' . $increment . ';';
+        $lines[] = '$data[\'' . $name . '\'][\'constraint\'] = ' . $length . ';';
+
+        if (! $column->isPrimaryKey())
+        {
+            $lines[] = '$data[\'' . $name . '\'][\'default\'] = ' . $default . ';';
+            $lines[] = '$data[\'' . $name . '\'][\'null\'] = ' . $null . ';';
+            $lines[] = '$data[\'' . $name . '\'][\'unsigned\'] = ' . $unsigned . ';';
+        }
+
+        if ($this->parser->isCreateTable() || $this->parser->isDeleteTable())
+        {
+            $lines[] = '$this->dbforge->add_field($data);';
+        }
+        else
+        {
+            $lines[] = '$this->dbforge->add_column(\'' . $table . '\', $data);';
+        }
+
+        if ($column->isPrimaryKey())
+        {
+            $lines[] = '$this->dbforge->add_key(\'' . $name . '\', true);';
+        }
+
+        return $lines;
     }
 }

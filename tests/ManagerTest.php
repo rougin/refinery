@@ -44,7 +44,7 @@ class ManagerTest extends Testcase
     /**
      * @return void
      */
-    public function test_empty_migrations()
+    public function test_00_empty_migrations()
     {
         $test = $this->findCommand('migrate');
 
@@ -58,11 +58,11 @@ class ManagerTest extends Testcase
     }
 
     /**
-     * @depends test_empty_migrations
+     * @depends test_00_empty_migrations
      *
      * @return void
      */
-    public function test_migrating_files()
+    public function test_01_migrating_files()
     {
         $this->useMysqlConfig();
 
@@ -98,11 +98,11 @@ class ManagerTest extends Testcase
     }
 
     /**
-     * @depends test_migrating_files
+     * @depends test_01_migrating_files
      *
      * @return void
      */
-    public function test_migrating_next_file()
+    public function test_02_migrating_next_file()
     {
         $test = $this->findCommand('migrate');
 
@@ -116,11 +116,11 @@ class ManagerTest extends Testcase
     }
 
     /**
-     * @depends test_migrating_next_file
+     * @depends test_02_migrating_next_file
      *
      * @return void
      */
-    public function test_nothing_to_migrate()
+    public function test_03_nothing_to_migrate()
     {
         $test = $this->findCommand('migrate');
 
@@ -134,45 +134,11 @@ class ManagerTest extends Testcase
     }
 
     /**
-     * @depends test_reset_to_0
+     * @depends test_03_nothing_to_migrate
      *
      * @return void
      */
-    public function test_nothing_to_rollback()
-    {
-        $test = $this->findCommand('rollback');
-
-        $test->execute(array());
-
-        $expected = '[PASS] Nothing to roll back.';
-
-        $actual = $this->getActualDisplay($test);
-
-        $this->assertEquals($expected, $actual);
-    }
-
-    /**
-     * @depends test_rolling_back
-     *
-     * @return void
-     */
-    public function test_reset_to_0()
-    {
-        $this->expectException('Exception');
-
-        $test = $this->findCommand('reset');
-
-        $test->execute(array());
-
-        $this->describe->columns('users');
-    }
-
-    /**
-     * @depends test_nothing_to_migrate
-     *
-     * @return void
-     */
-    public function test_rolling_back()
+    public function test_04_rolling_back()
     {
         $test = $this->findCommand('rollback');
 
@@ -186,6 +152,76 @@ class ManagerTest extends Testcase
     }
 
     /**
+     * @depends test_04_rolling_back
+     *
+     * @return void
+     */
+    public function test_05_reset_to_0()
+    {
+        $this->expectException('Exception');
+
+        $test = $this->findCommand('reset');
+
+        $test->execute(array());
+
+        $this->describe->columns('users');
+    }
+
+    /**
+     * @depends test_05_reset_to_0
+     *
+     * @return void
+     */
+    public function test_06_nothing_to_rollback()
+    {
+        $test = $this->findCommand('rollback');
+
+        $test->execute(array());
+
+        $expected = '[PASS] Nothing to roll back.';
+
+        $actual = $this->getActualDisplay($test);
+
+        $this->assertEquals($expected, $actual);
+    }
+
+    /**
+     * @depends test_06_nothing_to_rollback
+     *
+     * @return void
+     */
+    public function test_07_create_with_database()
+    {
+        // Migrate again the said migration files ---
+        $test = $this->findCommand('migrate');
+        $test->execute(array());
+        // ------------------------------------------
+
+        // Then clear the said files ---
+        $this->clearFiles();
+        // -----------------------------
+
+        // Create a new migration based on database ---
+        $test = $this->findCommand('create');
+
+        $input = array('name' => 'create_users_table');
+        $input['--from-database'] = true;
+        $test->execute($input);
+        // --------------------------------------------
+
+        // Clean database by rolling back to version 0 ---
+        $test = $this->findCommand('rollback');
+        $test->execute(array('--target' => '0'));
+        // -----------------------------------------------
+
+        $expected = $this->getTemplate('WithDatabase');
+
+        $actual = $this->getActualFile($input['name']);
+
+        $this->assertEquals($expected, $actual);
+    }
+
+    /**
      * @return void
      */
     protected function clearFiles()
@@ -195,10 +231,7 @@ class ManagerTest extends Testcase
         /** @var string[] */
         $files = glob($path . '/migrations/*.php');
 
-        foreach ($files as $file)
-        {
-            unlink($file);
-        }
+        array_map('unlink', $files);
     }
 
     /**
@@ -223,6 +256,55 @@ class ManagerTest extends Testcase
         $actual = str_replace("\r\n", '', $actual);
 
         return str_replace("\n", '', $actual);
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return string
+     */
+    protected function getActualFile($name)
+    {
+        $path = $this->app->getAppPath();
+
+        /** @var string[] */
+        $files = glob($path . '/migrations/*.php');
+
+        $selected = '';
+
+        foreach ($files as $file)
+        {
+            $base = basename($file);
+
+            $parsed = substr($base, 15, strlen($base));
+
+            if ($parsed === $name . '.php')
+            {
+                $selected = $file;
+
+                break;
+            }
+        }
+
+        /** @var string */
+        $result = file_get_contents($selected);
+
+        return str_replace("\r\n", "\n", $result);
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return string
+     */
+    protected function getTemplate($name)
+    {
+        $path = __DIR__ . '/Fixture/Plates/' . $name . '.php';
+
+        /** @var string */
+        $file = file_get_contents($path);
+
+        return str_replace("\r\n", "\n", $file);
     }
 
     /**
@@ -261,13 +343,5 @@ class ManagerTest extends Testcase
     protected function useMysqlConfig()
     {
         $this->useDatabaseConfig('mysql');
-    }
-
-    /**
-     * @return void
-     */
-    protected function useSqliteConfig()
-    {
-        $this->useDatabaseConfig('sqlite');
     }
 }

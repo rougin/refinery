@@ -92,6 +92,14 @@ class Parser
     /**
      * @return boolean
      */
+    public function isCreateTable()
+    {
+        return $this->getType() === Migration::TYPE_CREATE && $this->getColumn() === null;
+    }
+
+    /**
+     * @return boolean
+     */
     public function isDeleteColumn()
     {
         return ($this->getType() === Migration::TYPE_REMOVE || $this->getType() === Migration::TYPE_DELETE) && $this->getColumn() !== null;

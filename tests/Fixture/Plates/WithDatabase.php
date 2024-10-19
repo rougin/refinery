@@ -2,13 +2,20 @@
 
 use Rougin\Refinery\Migration;
 
-class Migration_add_name_in_users_table extends Migration
+class Migration_create_users_table extends Migration
 {
     /**
      * @return void
      */
     public function up()
     {
+        $data = array('id' => array());
+        $data['id']['type'] = 'integer';
+        $data['id']['auto_increment'] = true;
+        $data['id']['constraint'] = 10;
+        $this->dbforge->add_field($data);
+        $this->dbforge->add_key('id', true);
+
         $data = array('name' => array());
         $data['name']['type'] = 'varchar';
         $data['name']['auto_increment'] = false;
@@ -16,7 +23,9 @@ class Migration_add_name_in_users_table extends Migration
         $data['name']['default'] = null;
         $data['name']['null'] = true;
         $data['name']['unsigned'] = false;
-        $this->dbforge->add_column('users', $data);
+        $this->dbforge->add_field($data);
+
+        $this->dbforge->create_table('users');
     }
 
     /**
@@ -24,6 +33,6 @@ class Migration_add_name_in_users_table extends Migration
      */
     public function down()
     {
-        $this->dbforge->drop_column('users', 'name');
+        $this->dbforge->drop_table('users');
     }
 }
