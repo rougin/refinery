@@ -100,7 +100,7 @@ class Migration_create_users_table extends Migration
 > * The `Migration` class under `Refinery` is directly extended on `CI_Migration`.
 > * The created file will be in `migrations` directory under `application`. If it does not exists, `Refinery` will automatically create the specified directory.
 
-`Refinery` will try to guess the expected output of `up` and `down` methods of a migration file based on its name (e.g., `add_name_in_users_table`):
+When creating database migrations, `Refinery` will try to guess the expected output of `up` and `down` methods of a migration file based on its name (e.g., `add_name_in_users_table`):
 
 ```bash
 $ vendor/bin/refinery create add_name_in_users_table
@@ -164,6 +164,8 @@ When running this command, the target timestamp (`--target`) will always be the 
 
 ``` bash
 $ vendor/bin/refinery migrate --target=20241019044009
+[INFO] Migrating "create_users_table"...
+[PASS] "create_users_table" migrated!
 ```
 
 To rollback a database, kindly use the `rollback` command:
@@ -256,7 +258,7 @@ class Migration_create_users_table extends Migration
 
 ## Creating sequential migrations
 
-By default, this package uses a timestamp prefix as its numbering style when creating migration files. To change it to a sequential numbering instead, kindly add the `--sequential` option in the `create` command:
+By default, `Refinery` uses a timestamp prefix as its numbering style when creating migration files. To change it to a sequential numbering, kindly add the `--sequential` option in the `create` command:
 
 ``` bash
 $ vendor/bin/refinery create create_users_table --sequential
