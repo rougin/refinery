@@ -185,12 +185,32 @@ class Create extends Command
     {
         $type = $this->getConfig('migration_type');
 
-        $style = Migration::STYLE_TIMESTAMP;
-
+        // Set the migration type to "sequential" if defined -----------
         /** @var boolean */
         $sequential = $this->getOption('sequential');
 
-        if ($sequential || $type === '\'sequential\'')
+        if ($sequential && $type === '\'timestamp\'')
+        {
+            $file = $this->path . '/config/migration.php';
+
+            /** @var string */
+            $config = file_get_contents($file);
+
+            $text = '$config[\'migration_type\'] = \'sequential\';';
+
+            $pattern = '/\$config\[\\\'migration_type\\\'\] = (.*?);/i';
+
+            $result = preg_replace($pattern, $text, $config);
+
+            file_put_contents($file, $result);
+        }
+        // -------------------------------------------------------------
+
+        $type = $this->getConfig('migration_type');
+
+        $style = Migration::STYLE_TIMESTAMP;
+
+        if ($type === '\'sequential\'')
         {
             $style = Migration::STYLE_SEQUENCE;
         }

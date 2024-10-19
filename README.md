@@ -258,14 +258,7 @@ class Migration_create_users_table extends Migration
 
 ## Creating sequential migrations
 
-By default, `Refinery` uses a timestamp prefix as its numbering style when creating migration files. To change it to a sequential numbering, kindly add the `--sequential` option in the `create` command:
-
-``` bash
-$ vendor/bin/refinery create create_users_table --sequential
-[PASS] "001_create_users_table.php" successfully created!
-```
-
-When using the `--sequential` option, kindly ensure as well that the value of `$config['migration_type']` in `migration.php` was set to `sequential`:
+By default, `Refinery` uses a timestamp prefix as its numbering style when creating migration files. To change it to a sequential numbering, kindly update the value of `migration_type` in the `config/migration.php` to `sequential`:
 
 ``` php
 // ciacme/application/config/migration.php
@@ -288,6 +281,23 @@ When using the `--sequential` option, kindly ensure as well that the value of `$
 */
 $config['migration_type'] = 'sequential';
 ```
+
+Then run the `create` command to generate a migration file in sequential migration:
+
+``` bash
+$ vendor/bin/refinery create create_users_table
+[PASS] "001_create_users_table.php" successfully created!
+```
+
+Alternatively, the `--sequential` option can also be added in the `create` command to update the said configuration:
+
+``` bash
+$ vendor/bin/refinery create add_name_in_users_table --sequential
+[PASS] "002_add_name_in_users_table.php" successfully created!
+```
+
+> [!NOTE]
+> When using the `--sequential` option, the `migration_type` in the `config/migration.php` is also set as `sequential`.
 
 ## Using `refinery.yml`
 
