@@ -8,14 +8,14 @@ All notable changes to `Refinery` will be documented in this file.
 - `Parser` for determining commands to be used
 
 ### Changed
-- Based all functions to `CI_Migration` class
-- Separated core functionality from commands
-- Messages in displaying all commmand outputs
 - `auto_increment` option to `auto-increment` in `create` command
+- Based all functions to `CI_Migration` class
 - Code coverage provider to `Codecov`
 - Code documentation by `php-cs-fixer`
 - Improved code quality by `phpstan`
+- Minimum PHP version to `v5.3.0`
 - Reworked entire code structure
+- Separated core functionality from commands
 - Workflow provider to `Github Actions`
 
 ## [0.3.0](https://github.com/rougin/refinery/compare/v0.2.1...v0.3.0) - 2017-01-07
