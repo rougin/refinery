@@ -165,11 +165,13 @@ class Migration extends Classidy
     {
         $columns = $this->columns;
 
-        return function ($lines) use ($columns, $table)
+        $self = $this;
+
+        return function ($lines) use ($self, $columns, $table)
         {
             foreach ($columns as $column)
             {
-                $lines = $this->parseColumn($lines, $table, $column);
+                $lines = $self->parseColumn($lines, $table, $column);
             }
 
             return $lines;
@@ -190,7 +192,9 @@ class Migration extends Classidy
             $columns[] = $this->newIdColumn();
         }
 
-        return function ($lines) use ($columns, $table)
+        $self = $this;
+
+        return function ($lines) use ($self, $columns, $table)
         {
             foreach ($columns as $index => $column)
             {
@@ -199,7 +203,7 @@ class Migration extends Classidy
                     $lines[] = '';
                 }
 
-                $lines = $this->parseColumn($lines, $table, $column);
+                $lines = $self->parseColumn($lines, $table, $column);
             }
 
             $lines[] = '';
