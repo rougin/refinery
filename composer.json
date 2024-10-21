@@ -1,7 +1,7 @@
 {
   "name": "rougin/refinery",
   "description": "\"Ready-to-eat\" Codeigniter 3 migrations.",
-  "keywords": ["codeigniter", "database-migrations", "php"],
+  "keywords": [ "codeigniter", "database-migrations", "php" ],
   "homepage": "https://roug.in/refinery/",
   "license": "MIT",
   "authors":
