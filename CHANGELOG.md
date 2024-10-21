@@ -2,7 +2,7 @@
 
 All notable changes to `Refinery` will be documented in this file.
 
-## [0.4.0](https://github.com/rougin/refinery/compare/v0.3.0...v0.4.0) - Unreleased
+## [0.4.0](https://github.com/rougin/refinery/compare/v0.3.0...v0.4.0) - 2024-10-22
 
 ### Added
 - `Parser` for determining commands to be used
